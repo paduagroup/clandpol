@@ -3,7 +3,7 @@
 # Agilio Padua <agilio.padua@ens-lyon.fr>
 # Kateryna Goloviznina <kateryna.goloviznina@ens-lyon.fr>
 #
-# units: e, A, D
+# units: e, Å, D
 
 MONOMERS
 # name     q/e        mu/D
