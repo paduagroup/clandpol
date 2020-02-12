@@ -1,7 +1,7 @@
 # alpha.ff, version 18/12/19
 # Polarisable force field for ionic liquids
-# Kateryna Goloviznina, Agilio Padua
-# questions to: agilio.padua@ens-lyon.fr
+# Agilio Padua <agilio.padua@ens-lyon.fr>
+# Kateryna Goloviznina <kateryna.goloviznina@ens-lyon.fr>
 #
 # units: kJ/mol, A, deg
 # kforce is in the form k/2 r_D^2
