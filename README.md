@@ -31,7 +31,8 @@ Obtaining
 
 Download the files or clone the repository:
 
-git clone https://github.com/agiliopadua/pol_il.git
+(git clone https://github.com/agiliopadua/pol_il.git)
+(git clone https://github.com/agiliopadua/pol_il.git)
 
 
 Tutorial
@@ -40,9 +41,9 @@ Tutorial
 These are instructions on how to build an initial configuration for a
 polarisable system composed of molecules, ions or materials.
 
-A system consisting of one [C4C1im]+ cation and one [DCA]- anion is considered as an example. All input files can be found in the `example/` folder.
+A system consisting of one [C4C1im]+ cation and one [DCA]- anion is considered as an example. The input files can be found in the `example/` folder.
 
-1. Use `fftool` to create `data.lmp`, `in.lmp` and `pair.lmp` files. A separate `pair.lmp` file containing all i-j pair coefficients is required for future procedures and can be created using `-a` option in `fftool`. The detailed instructions on how to use `fftool` can be found [here](https://github.com/agiliopadua/fftool).
+1. Use `fftool` to create `data.lmp`, `in.lmp` and `pair.lmp` files. A separate `pair.lmp` file containing all i-j pair coefficients is required for future procedures and can be created using `-a` option of `fftool`. The detailed instructions on how to use `fftool` can be found [here](https://github.com/agiliopadua/fftool).
 
         fftool 1 c4c1im.zmat 1 dca.zmat -b 20
         packmol <pack.inp
