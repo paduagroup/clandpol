@@ -194,7 +194,8 @@ A system consisting of one [C4C1im]+ cation and one [DCA]- anion is considered a
              c4h10       c4h10      0.94       1.00
              c4h10         dca      0.69       0.72
         ----------------------------------------------
-    To perform the simulation of a polarisable system, the `USER-DRUDE` package should be enabled during LAMMPS compilation.
+  
+To perform the simulation of a polarisable system, the `USER-DRUDE` package should be enabled during LAMMPS compilation.
 
 References
 ----------
