@@ -67,8 +67,7 @@ A system consisting of one [C4C1im]+ cation and one [DCA]- anion is considered a
     * `thole` is a parameter of the Thole damping function.
 
     The harmonic constant and the charge on the Drude particle are related though
-
-    <img src="https://latex.codecogs.com/svg.latex?\Large&space;\alpha = q_D^2/k_D" title="\Large \alpha = q_D^2/k_D" />
+    <img src="https://render.githubusercontent.com/render/math?math=\alpha = q_D^2/k_D">
 
     Use the `-q` option to read the force constant from the input file and to calculate Drude charge from the polarizabilities or the `-k` option to read the Drude charge from `alpha.ff` and to recalculate the force constant according to the relation above.
 
