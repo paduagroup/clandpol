@@ -180,7 +180,7 @@ A system consisting of one [C4C1im]+ cation and one [DCA]- anion is considered a
         C4H10  9:12
         dca   13:15
 
-    where atomic indices or/and a range of indices correspond to atomic types associating with this fragment in `data.lmp` file. In this example, NA, CR, CW, C1, HCR, C1A, HCW, H1 belong to c2c1im fragment, C2, CS, HC, CT to C4H10 fragment and N3A, CZA, NZA to dca fragment.
+    where atomic indices or/and a range of indices correspond to atomic types associating with this fragment in `data.lmp` file. In this example, NA, CR, CW, C1, HCR, C1A, HCW, H1 belong to c2c1im fragment, C2, CS, HC, CT to C4H10 fragment and N3A, CZA, NZA to dca fragment; the script requires `c2c1im.zmat`, `C4H10.zmat` and `dca.zmat` structure files.
 
     Scaled epsilon (and sigma) values for LJ interaction are printed into `pair-p-sc.lmp` file that directly can be used by LAMMPS. The scaling coefficients are outputted to the terminal.
     If they are obtained by the prediction scheme, SAPT calculated values (if availiable) are given only for the comparison.
