@@ -31,7 +31,8 @@ Obtaining
 
 Download the files or clone the repository:
 
-(git clone https://github.com/agiliopadua/pol_il.git)
+git clone https://github.com/kateryna-goloviznina/pol_il.git
+
 (git clone https://github.com/agiliopadua/pol_il.git)
 
 
@@ -53,7 +54,7 @@ A system consisting of one [C4C1im]+ cation and one [DCA]- anion is considered a
 
         python polarizer.py c4c1im.zmat dca.zmat -f alpha.ff -q -id data.lmp -od data-p.lmp
 
-   The script requires a file containing the specification of Drude induced dipoles according to the next format and specified by `-q` option.
+   The script requires a file containing the specification of Drude induced dipoles according to the next format and specified by `-f` option.
 
         # alpha.ff
         type  dm/u  dq/e  k/(kJ/molA2)  alpha/A3  thole
@@ -67,10 +68,8 @@ A system consisting of one [C4C1im]+ cation and one [DCA]- anion is considered a
     * `alpha` is the polarizability, hyrdogen aroms are not merged,
     * `thole` is a parameter of the Thole damping function.
 
-    The harmonic constant and the charge on the Drude particle are related though
-    <img src="https://render.githubusercontent.com/render/math?math=\alpha = q_D^2/k_D">
-
-    Use the `-q` option to read the force constant from the input file and to calculate Drude charge from the polarizabilities or the `-k` option to read the Drude charge from `alpha.ff` and to recalculate the force constant according to the relation above.
+    The harmonic constant and the charge on the Drude particle are related though the relation
+    <img src="https://render.githubusercontent.com/render/math?math=\alpha = q_D^2/k_D">. Use the `-q` option to read the force constant from the input file and to calculate Drude charge from the polarizabilities or the `-k` option to read the Drude charge from `alpha.ff` and to recalculate the force constant according to the relation above.
 
     A Drude particle is created for each atom in the LAMMPS data file
     that corresponds to an atom type given in the Drude file.
@@ -85,7 +84,7 @@ A system consisting of one [C4C1im]+ cation and one [DCA]- anion is considered a
 
     This script adds new atom types, new bond types, new atoms and
     new bonds to the `data-p.lmp` file.
-    It generates the commands to be included in the `LAMMPS` input script and outputs to the terminal. They are related to the topology and force field, namely `fix drude`, `pair_style` commands and examples of thermostats and barostats are proposed:
+    It generates the commands to be included in the `LAMMPS` input script and outputs them to the terminal. They are related to the topology and the force field, namely `fix drude`, `pair_style` commands and some examples of thermostats and barostats are proposed:
 
         # Commands to include in the LAMMPS input script
 
@@ -150,6 +149,9 @@ A system consisting of one [C4C1im]+ cation and one [DCA]- anion is considered a
 
         python scaleLJ.py -f fragment.ff -a alpha.ff -i fragment.inp -ip pair-p.lmp -op pair-p-sc.lmp
 
+    The script performs modification of Lennard-Jones interaction between atoms of the fragments.
+    In order to remove a double counting of the induction effects, which are included implicitly in the empirical LJ potential, the epsilon value should be scaled. By default, the scaling factor is predicted by this script on the basis of simple properties. It can also be obtained through quantum chemistry calculation, Symmetry-Adapted Perturbation Theory (SAPT), and it can be used by the `-q` option. Scaling of the sigma value allows to adjust density of the system (if necessary), it can be enabled using the `-s` option with a default value of 0.985.
+    
     The script requires several input files with fragment specification, structure files of fragments in common formats (`.xyz`, `.zmat`, `.mol`, `.pdb`) and `pair-p.lmp` file.
 
     Format of file containing monomers and dimers specification:
@@ -180,11 +182,8 @@ A system consisting of one [C4C1im]+ cation and one [DCA]- anion is considered a
 
     where atomic indices or/and a range of indices correspond to atomic types associating with this fragment in `data.lmp` file. In this example, NA, CR, CW, C1, HCR, C1A, HCW, H1 belong to c2c1im fragment, C2, CS, HC, CT to C4H10 fragment and N3A, CZA, NZA to dca fragment.
 
-    The script performs modification of Lennard-Jones interaction between atoms of the fragments.
-    In order to remove a double counting of the induction effects, which are included implicitly in the empirical LJ potential, the epsilon value should be scaled. By default, the scaling factor is predicted by this script on the basis of simple properties. On the other hand, it can be obtained through quantum chemistry calculation, Symmetry-Adapted Perturbation Theory (SAPT), and it can be used by the `-q` option. Scaling of the sigma value allows to adjust density of the system (if necessary), it can be enabled using `-s` option with a default value of 0.985.
-
     Scaled epsilon (and sigma) values for LJ interaction are printed into `pair-p-sc.lmp` file that directly can be used by LAMMPS. The scaling coefficients are outputted to the terminal.
-    If they were obtained by the prediction scheme, SAPT calculated values (if availiable) are given only for the comparison.
+    If they are obtained by the prediction scheme, SAPT calculated values (if availiable) are given only for the comparison.
 
         Epsilon LJ parameters were scaled by k_pred parameter. Changes are marked with '~'.
         Sigma LJ parameters were not scaled.
