@@ -42,30 +42,32 @@ Tutorial
 These are instructions on how to build an initial configuration for a
 polarisable system composed of molecules, ions or materials.
 
+To perform the simulation of a polarisable system, the `USER-DRUDE` package should be enabled during LAMMPS compilation.
+
 A system consisting of one [C4C1im]+ cation and one [DCA]- anion is considered as an example. The input files can be found in the `example/` folder.
 
-1. Use `fftool` to create `data.lmp`, `in.lmp` and `pair.lmp` files. A separate `pair.lmp` file containing all i-j pair coefficients is required for future procedures and can be created using `-a` option of `fftool`. The detailed instructions on how to use `fftool` can be found [here](https://github.com/agiliopadua/fftool).
+1. Use `fftool` to create `data.lmp`, `in.lmp` and `pair.lmp` files. A separate `pair.lmp` file containing all i-j pair coefficients is required for future procedures and can be created using the `-a` option of `fftool`. The detailed instructions on how to use `fftool` can be found [here](https://github.com/agiliopadua/fftool).
 
         fftool 1 c4c1im.zmat 1 dca.zmat -b 20
         packmol <pack.inp
         fftool 1 c4c1im.zmat 1 dca.zmat -b 20 -a -l
 
-2. Add Drude induced dipoles to LAMMPS data file using `polarizer.py` script.
+2. Add Drude induced dipoles to LAMMPS data file using the `polarizer.py` script.
 
         python polarizer.py c4c1im.zmat dca.zmat -f alpha.ff -q -id data.lmp -od data-p.lmp
 
-   The script requires a file containing the specification of Drude induced dipoles according to the next format and specified by `-f` option.
+   The script requires a file containing the specification of Drude induced dipoles according to the following format, and specified with the `-f` option:
 
         # alpha.ff
         type  dm/u  dq/e  k/(kJ/molA2)  alpha/A3  thole
         CR      0.4    -1.0     4184.0   1.122   2.6    
-        NA      0.4    -1.0     4184.0   1.208   2.6 
+        NA      0.4    -1.0     4184.0   1.208   2.6
         ...
     where
     * `dm` is the mass to place on the Drude particle (taken from its core),
     * `dq` is the charge to place on the Drude particle (taken from its core),
     * `k` is the harmonic force constant of the bond between core and Drude,
-    * `alpha` is the polarizability, hyrdogen aroms are not merged,
+    * `alpha` is the polarizability (hydrogen aroms are not merged),
     * `thole` is a parameter of the Thole damping function.
 
     The harmonic constant and the charge on the Drude particle are related though the relation
@@ -84,7 +86,7 @@ A system consisting of one [C4C1im]+ cation and one [DCA]- anion is considered a
 
     This script adds new atom types, new bond types, new atoms and
     new bonds to the `data-p.lmp` file.
-    It generates the commands to be included in the `LAMMPS` input script and outputs them to the terminal. They are related to the topology and the force field, namely `fix drude`, `pair_style` commands and some examples of thermostats and barostats are proposed:
+    It generates the commands to be included in the `LAMMPS` input script and outputs them to the terminal. They are related to the topology and the force field, namely the `fix drude` and `pair_style` commands. Some examples of thermostats and barostats are proposed:
 
         # Commands to include in the LAMMPS input script
 
@@ -113,13 +115,13 @@ A system consisting of one [C4C1im]+ cation and one [DCA]- anion is considered a
         compute TATOM ATOMS temp
         compute TDRUDE all temp/drude
 
-        # examples of termostats and barotats
-        # NVT (Nose-Hoover)
+        # examples of thermostats and barostats
+        # NVT (Nosé-Hoover)
         fix DTDIR all drude/transform/direct
         fix TSTAT ATOMS nvt temp 300.0 300.0 200
         fix TSTDR DRUDES nvt temp 1.0 1.0 50
         fix DTINV all drude/transform/inverse
-        # NPT (Nose-Hoover)
+        # NPT (Nosé-Hoover)
         fix DTDIR all drude/transform/direct
         fix TSTAT ATOMS npt temp 300.0 300.0 200 iso 1.0 1.0 1000
         fix_modify TSTAT temp TATOM press thermo_press
@@ -150,11 +152,11 @@ A system consisting of one [C4C1im]+ cation and one [DCA]- anion is considered a
         python scaleLJ.py -f fragment.ff -a alpha.ff -i fragment.inp -ip pair-p.lmp -op pair-p-sc.lmp
 
     The script performs modification of Lennard-Jones interaction between atoms of the fragments.
-    In order to remove a double counting of the induction effects, which are included implicitly in the empirical LJ potential, the epsilon value should be scaled. By default, the scaling factor is predicted by this script on the basis of simple properties. It can also be obtained through quantum chemistry calculation, Symmetry-Adapted Perturbation Theory (SAPT), and it can be used by the `-q` option. Scaling of the sigma value allows to adjust density of the system (if necessary), it can be enabled using the `-s` option with a default value of 0.985.
-    
-    The script requires several input files with fragment specification, structure files of fragments in common formats (`.xyz`, `.zmat`, `.mol`, `.pdb`) and `pair-p.lmp` file.
+    To prevent double counting of the induction effects, which are included implicitly in the empirical LJ potential, the epsilon value should be scaled. By default, the scaling factor is predicted by this script on the basis of simple properties. It can also be obtained through quantum chemistry calculation, via Symmetry-Adapted Perturbation Theory (SAPT), which can be invoked with the `-q` option. Scaling of the sigma value allows adjustment of the density of the system (if necessary), and can be enabled using the `-s` option which has a default value of 0.985.
 
-    Format of file containing monomers and dimers specification:
+    The script requires several input files with fragment specification, structure files of fragments in common formats (`.xyz`, `.zmat`, `.mol`, `.pdb`), and the `pair-p.lmp` file.
+
+    Format of file containing specification of monomers and dimers:
 
         # fragment.ff
         MONOMERS
@@ -180,10 +182,10 @@ A system consisting of one [C4C1im]+ cation and one [DCA]- anion is considered a
         C4H10  9:12
         dca   13:15
 
-    where atomic indices or/and a range of indices correspond to atomic types associating with this fragment in `data.lmp` file. In this example, NA, CR, CW, C1, HCR, C1A, HCW, H1 belong to c2c1im fragment, C2, CS, HC, CT to C4H10 fragment and N3A, CZA, NZA to dca fragment. Thus, the script requires `c2c1im.zmat`, `C4H10.zmat` and `dca.zmat` structure files.
+    where atomic indices or/and a range of indices correspond to atomic types associating with this fragment in the `data.lmp` file. In this example, NA, CR, CW, C1, HCR, C1A, HCW, H1 belong to the c2c1im fragment; C2, CS, HC, CT are from the C4H10 fragment and N3A, CZA, NZA are from the dca fragment. Thus, the script requires `c2c1im.zmat`, `C4H10.zmat` and `dca.zmat` structure files.
 
-    Scaled epsilon (and sigma) values for LJ interaction are printed into `pair-p-sc.lmp` file that directly can be used by LAMMPS. The scaling coefficients are outputted to the terminal.
-    If they are obtained by the prediction scheme, SAPT calculated values (if availiable) are given only for the comparison.
+    Scaled epsilon (and sigma) values for LJ interaction are printed into a `pair-p-sc.lmp` file that directly can be used by LAMMPS. The scaling coefficients are outputted to the terminal.
+    If they are obtained by the prediction scheme, SAPT calculated values (if available) are given only for the comparison.
 
         Epsilon LJ parameters were scaled by k_pred parameter. Changes are marked with '~'.
         Sigma LJ parameters were not scaled.
@@ -194,8 +196,6 @@ A system consisting of one [C4C1im]+ cation and one [DCA]- anion is considered a
              c4h10       c4h10      0.94       1.00
              c4h10         dca      0.69       0.72
         ----------------------------------------------
-  
-To perform the simulation of a polarisable system, the `USER-DRUDE` package should be enabled during LAMMPS compilation.
 
 References
 ----------
@@ -203,7 +203,7 @@ References
 * [Packmol](http://www.ime.unicamp.br/~martinez/packmol/):
   L. Martinez et al. J Comp Chem 30 (2009) 2157, DOI:
   [10.1002/jcc.21224](http://dx.doi.org/10.1002/jcc.21224).
-  
+
 * [LAMMPS](http://lammps.sandia.gov/): S. Plimton, J Comp Phys
   117 (1995) 1, DOI:
   [10.1006/jcph.1995.1039](http://dx.doi.org/10.1006/jcph.1995.1039).
