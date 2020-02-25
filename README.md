@@ -31,9 +31,7 @@ Obtaining
 
 Download the files or clone the repository:
 
-git clone https://github.com/kateryna-goloviznina/pol_il.git
-
-(git clone https://github.com/agiliopadua/pol_il.git)
+git clone https://github.com/agiliopadua/pol_il.git
 
 
 Tutorial
