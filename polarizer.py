@@ -9,6 +9,7 @@ import sys
 import argparse
 import random
 import math
+import shutil
 from copy import deepcopy
 
 
@@ -696,7 +697,7 @@ class Data(object):
               "could be used,")
         print("#    avoiding hybrid/overlay and allowing mixing. See doc "\
               "pages.")
-        import shutil
+
         with open('pair-p.lmp', 'wb') as wfd:
             for f in ['pair.lmp', 'pair-drude.lmp']:
                 with open(f, 'rb') as fd:
