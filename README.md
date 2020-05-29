@@ -143,7 +143,7 @@ A system consisting of one [C4C1im]+ cation and one [DCA]- anion is considered a
         #    of Drude particles. Alternatively pair lj/cut/thole/long could be used,
         #    avoiding hybrid/overlay and allowing mixing. See doc pages.
 
-    Pair i-j interactions between induced dipoles are described by `pair_coeff` in `pair-drude.lmp`, created by this script. We propose to concatenate `pair.lmp` and `pair-drude.lmp` files into `pair-p.lmp`.
+    Pair i-j interactions between induced dipoles are described by `pair_coeff` in `pair-drude.lmp`. The script creates these files and concatenates `pair.lmp` and `pair-drude.lmp` files into `pair-p.lmp`, which is used for the next step.
 
 3. Scale parameters of LJ interactions between particular fragments.
 
