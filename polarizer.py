@@ -596,8 +596,13 @@ class Data(object):
                     jfound = False
                 ifound = False
         
-
-    def lmpscript(self, drude, outfile, thole = 2.6, cutoff = 12.0):
+    def concatenatepairfile (self, inpfile, outpfile, pairfile):
+        with open(outpfile, 'wb') as wfd:
+            for f in [inpfile, pairfile]:
+                with open(f, 'rb') as fd:
+                    shutil.copyfileobj(fd, wfd)
+    
+    def lmpscript(self, drude, outfile, inpfile, outpfile, thole = 2.6, cutoff = 12.0):
         """print lines for input script, including pair_style thole"""
 
         pairfile = "pair-drude.lmp"
@@ -625,6 +630,7 @@ class Data(object):
         print("include {0}\n".format(pairfile))
 
         self.writepairfile (pairfile,drude,thole,att['id'])
+        self.concatenatepairfile (inpfile, outpfile, pairfile)
 
         print("# atom groups convenient for thermostats (see package "
               "documentation), etc.")
@@ -697,11 +703,6 @@ class Data(object):
               "could be used,")
         print("#    avoiding hybrid/overlay and allowing mixing. See doc "\
               "pages.")
-
-        with open('pair-p.lmp', 'wb') as wfd:
-            for f in ['pair.lmp', 'pair-drude.lmp']:
-                with open(f, 'rb') as fd:
-                    shutil.copyfileobj(fd, wfd)
 
 # --------------------------------------
 
@@ -1236,7 +1237,11 @@ def main():
                         help = 'input LAMMPS data file (default: data.lmp)')
     parser.add_argument('-od', '--outdfile', default = 'data-p.lmp',
                         help = 'output LAMMPS data file (default: data-p.lmp)')
-
+    parser.add_argument('-ip', '--inpfile', default = 'pair.lmp',
+                        help = 'input LAMMPS pair file (default: pair.lmp)')
+    parser.add_argument('-op', '--outpfile', default = 'pair-p.lmp',
+                        help = 'output LAMMPS pair file (default: pair-p.lmp)')
+    
     args = parser.parse_args()
 
     if args.qcalc:
@@ -1251,7 +1256,7 @@ def main():
     drude = Drude(sys, args.ffdrude, polar, args.positive, args.metal)
     if not args.depolarize:
         data.polarize(drude)
-        data.lmpscript(drude, args.outdfile, args.thole, args.cutoff)
+        data.lmpscript(drude, args.outdfile, args.inpfile, args.outpfile, args.thole, args.cutoff)
     else:
         data.depolarize(drude)
     data.write(args.outdfile)
