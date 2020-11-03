@@ -17,7 +17,9 @@ Contents
 
 * `fragment_topologies/`: structure files for typical IL fragments.
 
-* `examples/`: examples of [C4C1im][DCA] molecule files and force field database.
+* `example_il/`: examples of [C4C1im][DCA] molecule files and force field database (aprotic ionic liquid).
+
+* `example_pil/`: examples of ethylammonium nitrate (EAN) molecule files and force field database (protic ionic liquid).
 
 Requirements
 ------------
@@ -42,7 +44,12 @@ polarisable system composed of molecules, ions or materials.
 
 To perform the simulation of a polarisable system, the `USER-DRUDE` package should be enabled during LAMMPS compilation.
 
-A system consisting of one [C4C1im]+ cation and one [DCA]- anion is considered as an example. The input files can be found in the `example/` folder.
+Two systems, 1-butyl-3-methylimidazolium dicyanamide ([C4C1im][DCA]) and
+ethylammonium nitrate (EAN), are considered as examples of aprotic and protic ionic liquids, respectively.
+
+**Example 1. Aprotic ionic liquid.**
+
+The input files for a system consiting of one [C4C1im]+ cation and one [DCA]- anion can be found in the `example_il/` folder.
 
 1. Use `fftool` to create `data.lmp`, `in.lmp` and `pair.lmp` files. A separate `pair.lmp` file containing all i-j pair coefficients is required for future procedures and can be created using the `-a` option of `fftool`. The detailed instructions on how to use `fftool` can be found [here](https://github.com/agiliopadua/fftool).
 
@@ -195,6 +202,78 @@ A system consisting of one [C4C1im]+ cation and one [DCA]- anion is considered a
              c4h10         dca      0.69       0.72
         ----------------------------------------------
 
+**Example 2. Protic ionic liquid (or any other strongly H-bonded system).**
+
+The input files of a system consisting of one ethylammonium nitrate ion pair can be found in the `example_pil/` folder.
+
+1. Steps 1-3 are identical to the ones of the **Example 1**.
+
+        fftool 1 N2000.zmat 1 no3.zmat -b 20
+        packmol <pack.inp
+        fftool 1 N2000.zmat 1 no3.zmat -b 20 -a -l
+        python polarizer.py N2000.zmat no3.zmat -f alpha.ff -q
+        python scaleLJ.py -q 
+
+    Here the modification of the parameters of LJ interactions between N2000 and NO3 fragments is performed using the scaling factor obtained through SAPT calculation invoked with the `-q` option.
+
+2. Add short range damping of charge-dipole Coulomb interactions between small, highly charged atoms (such as hydrogen) and induced dipoles to prevent the "polarization catastrophe".
+
+        python coul_tt.py -d data-p.lmp -p pair-p-sc.lmp -a 3
+
+    The functional form of the damping function is
+    
+    <img src="https://render.githubusercontent.com/render/math?math=f(r) = 1 - c \cdot e^{-b r} \sum_{k=0}^4 \frac{(b r)^k}{k!}">
+
+    resulting from an adaptation to the Coulomb interaction of the damping function originally proposed by Tang Toennies for van der Waals interactions. The `b` value is set to 4.5 and the `c` value to 1.0. This function is implemented as a `coul/tt` pair style in LAMMPS (version 29Oct20 or newer), the detailed discription is given [here](https://lammps.sandia.gov/doc/pair_coul_tt.html). 
+
+    The script requires the `data.lmp` file to obtain the list of atoms and their type (polarisable or nonpolarisable). 
+
+        1   13.607  # N1 DC
+        2   11.611  # C1N DC
+        3    1.008  # HN
+        4   11.611  # CEN DC
+        5    1.008  # H1N
+        6    1.008  # HCN
+        7   13.601  # NO DC
+        8   15.599  # ON DC
+        9    0.400  # N1 DP
+       10    0.400  # C1N DP
+       11    0.400  # CEN DP
+       12    0.400  # NO DP
+       13    0.400  # ON DP
+
+    The atomic indices of small, highly charged atoms (typically, point charges without LJ sites) should be specified with the `-a` option. The short range Coulomb interactions of those atoms with all Drude cores and Drude partiles should be damped. The corresponding `pair_coeff` lines are appended to the `pair-p-sc.lmp` file.
+
+        pair_coeff    1    3 coul/tt 4.5 1.0
+        pair_coeff    2    3 coul/tt 4.5 1.0
+        pair_coeff    3    4 coul/tt 4.5 1.0
+        pair_coeff    3    7 coul/tt 4.5 1.0
+        pair_coeff    3    8 coul/tt 4.5 1.0
+        pair_coeff    3   9* coul/tt 4.5 1.0
+
+
+    Here, the damped interactions are the ones of the HN atom (index 3) with Drude cores (indices 1, 2, 4, 7, 8) and Drude particles (indices 9-13).
+
+    The script prints the command to be included by the user to the `in-p.lmp` file to declare the `coul/tt` pair style. 
+
+        To inlcude to in-p.lmp:
+	        pair_style hybrid/overlay ... coul/tt 4 12.0
+
+3. Modify the LJ interaction parameters of particular i-j pairs involved into hydrogen bond formation, if necessary.
+
+    The hydrogen bonds (D-H...A) formed between hydrogen atoms represented by 'naked' charges without a Lennard-Jones sites could lead to "freezing" of a system when modelled using polarisable force field. To avoid this effect, the repulsive potential between D and A sites should be adjusted with a typical value of the sigma parameter of 3.75 - 3.80 Å.
+
+    In EAN, the hydrogen bond is formed between HN hydrogens atoms of the cation embedded into neighbouring N1 nitrogen atoms and the ON oxygen atoms of the anion. The sigma LJ parameter of the N1-ON interaction should be increased from 3.10 Å to 3.75 Å.
+
+    The `pair_coeff` line of the interaction between N1 and ON atoms in the `pair-p-sc.lmp` file
+
+        pair_coeff    1    8 lj/cut/coul/long     0.037789     3.101612  # N1 ON 
+        
+    should be replaced by
+        
+        pair_coeff    1    8 lj/cut/coul/long     0.037789     3.750000  # N1 ON 
+
+
 References
 ----------
 
@@ -208,3 +287,6 @@ References
 
 * CL&Pol: K. Goloviznina, J. N. Canongia Lopes, M. Costa Gomes, A. A. H. Pádua,  J. Chem. Theory Comput. 15 (2019), 5858, DOI:
   [10.1021/acs.jctc.9b00689](https://doi.org/10.1021/acs.jctc.9b00689).
+
+* CL&Pol for PIL, DES, electrolytes: K. Goloviznina, Z. Gong, M. Costa Gomes, A. A. H. Pádua, submitted to J. Chem. Theory Comput. DOI (preprint):
+  [10.26434/chemrxiv.12999524.v2](https://doi.org/10.26434/chemrxiv.12999524.v2).

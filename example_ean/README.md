@@ -1,0 +1,1 @@
+<img src="ean.png" alt="ean" width="350"/>
