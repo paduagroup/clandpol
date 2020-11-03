@@ -265,6 +265,8 @@ The input files of a system consisting of one ethylammonium nitrate ion pair can
 
     In EAN, the hydrogen bond is formed between HN hydrogens atoms of the cation embedded into neighbouring N1 nitrogen atoms and the ON oxygen atoms of the anion. The sigma LJ parameter of the N1-ON interaction should be increased from 3.10 Å to 3.75 Å.
 
+    <img src="example_ean/ean.png" alt="ean" width="300"/>
+
     The `pair_coeff` line of the interaction between N1 and ON atoms in the `pair-p-sc.lmp` file
 
         pair_coeff    1    8 lj/cut/coul/long     0.037789     3.101612  # N1 ON 
