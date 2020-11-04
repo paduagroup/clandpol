@@ -261,7 +261,7 @@ The input files of a system consisting of one ethylammonium nitrate ion pair can
 
 3. Modify the LJ interaction parameters of particular i-j pairs involved into hydrogen bond formation, if necessary.
 
-    The hydrogen bonds (D-H...A) involving hydrogen atoms represented by 'naked' charges without Lennard-Jones sites could lead to "freezing" of a system when modelled using polarisable force field. To avoid this effect, the repulsive potential between D and A sites should be adjusted with a typical value of the sigma parameter of 3.75 - 3.80 Å.
+    The hydrogen bonds (D-H...A) involving hydrogen atoms represented by 'naked' charges without Lennard-Jones sites could lead to "freezing" of a system when modelled using polarisable force field. To avoid this effect, the repulsive potential between D and A sites should be adjusted with a typical value of the sigma parameter of 3.7 - 3.8 Å.
 
     In EAN, the hydrogen bond is formed between HN hydrogens atoms of the cation embedded into neighbouring N1 nitrogen atoms and the ON oxygen atoms of the anion. The sigma LJ parameter of the N1-ON interaction should be increased from 3.10 Å to 3.75 Å.
 
