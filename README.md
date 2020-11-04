@@ -21,6 +21,8 @@ Contents
 
 * `example_pil/`: examples of ethylammonium nitrate (EAN) molecule files and force field database (protic ionic liquid).
 
+* `example_des/`: examples of choline chloride - ethylene glycol (ChCl-EG) molecule files and force field database (deep eutectic solvent).
+
 Requirements
 ------------
 

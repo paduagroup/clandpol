@@ -1,0 +1,142 @@
+MONOMERS
+# name     q/e        mu/D
+# cations
+c2c1im       1.0      1.1558
+c2c1c1im     1.0      1.4010
+c1c1pyrr     1.0      1.6413
+c2py         1.0      0.5329
+N1111        1.0      0.0015
+P1111        1.0      0.0015
+N1110        1.0      0.8461
+N2000        1.0      3.8756
+ch           1.0      3.4533
+# anions 
+dca         -1.0      0.8874
+bf4         -1.0      0.0000
+fsi         -1.0      0.4245
+ntf2        -1.0      4.0070
+mso         -1.0      3.5663
+oac         -1.0      3.1851
+otf         -1.0      4.1463
+pf6         -1.0      0.0000
+tfa         -1.0      4.6481
+cns         -1.0      1.0133
+ch3so4      -1.0      4.0557
+ccn3        -1.0      0.0078
+cl          -1.0      0.0000
+br          -1.0      0.0000
+no3         -1.0      0.0000
+# neutral    
+C4H10        0.0      0.0000
+C4F10        0.0      0.0236      
+C6H14        0.0      0.0000
+dme          0.0      1.2442
+tol          0.0      0.2802
+bz           0.0      0.0000 
+an           0.0      3.7467
+dmso         0.0      3.8514
+meoh         0.0      1.5667
+etoh         0.0      1.5459
+urea         0.0      4.2041
+nmp          0.0      3.7301
+actn         0.0      2.6009
+ch3cooh      0.0      4.0667
+me2o         0.0      1.2190
+
+DIMERS
+# m1        m2    r_COM/Å  k_sapt
+# cation-anion
+c2c1im	    dca	    2.935    0.61
+c2c1im	    ntf2	4.314    0.65
+c2c1im	    bf4	    3.088    0.52
+c2c1im	    oac	    4.073    0.27
+c2c1im	    otf	    4.290    0.49
+c2c1im	    mso	    3.546    0.44
+c2c1im      fsi     3.377
+c1c1pyrr	bf4	    3.724    0.46
+c1c1pyrr	dca	    4.094    0.53
+c1c1pyrr	ntf2	4.725    0.54
+c2py	    bf4	    3.143    0.51
+c2py	    ntf2	4.206    0.60
+N1111	    bf4	    3.819    0.43
+N1111	    ntf2	4.576    0.55
+N1111       cl      3.524
+N1111       br      3.711
+P1111       cl      3.453
+P1111       br      3.647
+ch          cl      3.499    0.35
+N2000       no3     3.453    0.20
+N1110       ntf2    4.116
+P1111       ntf2    4.422    0.56
+# cation-neutral
+c2c1im	    C4H10	3.613    0.76
+c2c1im	    C6H14	3.992    0.74
+c2c1im	    tol	    3.894    0.63
+c2c1im	    dmso	5.021    0.42
+c2c1im      bz  	4.049    0.62
+c1c1pyrr	C4H10	4.429    0.67
+c1c1pyrr    dme	    5.023    0.59
+c2py	    C4H10	3.761    0.76
+N1111	    C4H10	4.453    0.60
+N1111       urea    3.368
+N1111       ch3cooh 4.480
+N1111       actn    4.672
+N1111       meoh    4.030
+P1111       C4H10   4.426    0.63
+P1111       ch3cooh 4.418
+N1110       C4H10   4.403
+P1111       me2o    4.093    0.58
+ch          meoh    4.015  
+# neutral-anion
+C4H10	    dca	    3.542    0.69
+C6H14	    dca	    3.608    0.61
+C4H10	    ntf2	4.436    0.77
+C6H14	    ntf2	4.117    0.77
+C4H10	    bf4	    3.531    0.51
+C6H14	    bf4	    3.476    0.51
+C4H10	    mso	    3.737    0.56
+C4H10	    cl 	    3.303
+C4H10	    br 	    3.501
+C4H10	    oac     4.273
+C4H10	    otf     3.960
+meoh        cl      3.165
+meoh        br      3.340
+urea        cl      3.718
+actn        cl      3.937
+ch3cooh     cl      3.737
+ch3cooh     br      3.944
+dmso	    ntf2	4.355    0.69
+dmso        oac 	3.844    0.42
+dme	        fsi	    4.583    0.73
+tol	        mso	    4.898    0.50
+an	        ntf2	4.950    0.71
+bz	        oac	    4.879    0.37
+bz	        otf	    5.858    0.64
+ntf2        me2o    4.519    0.75
+# neutral-neutral
+C4H10	    C4H10	4.170    0.94
+C4H10	    tol	    3.618    0.90
+C4H10       ch3cooh 3.501
+C4H10       urea    3.344
+C4H10       meoh    3.691
+C4H10       actn    3.522
+C4H10       dmso	3.822    0.79
+C4H10       dme	 	3.663    0.93
+C4H10       an	 	3.880    0.87
+dmso	    dmso	3.912    0.70
+dmso	    tol	    4.183    0.75
+meoh        meoh    4.905
+meoh        urea    3.428
+meoh        ch3cooh 3.537
+meoh        actn    3.363
+urea        urea    4.317
+ch3cooh     ch3cooh 4.221
+ch3cooh     actn    3.396
+actn        actn    4.432
+dme	        dme	    3.856    0.89
+an	        an	    3.403    0.69
+bz	        bz	    3.800    0.95
+bz	        nmp     5.010    0.89
+nmp         nmp     3.518    0.79
+C4H10       me2o    3.943    0.90
+me2o        me2o    3.976    0.82
