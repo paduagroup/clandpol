@@ -49,7 +49,7 @@ ethylammonium nitrate (EAN), are considered as examples of aprotic and protic io
 
 **Example 1. Aprotic ionic liquid.**
 
-The input files for a system consiting of one [C4C1im]+ cation and one [DCA]- anion can be found in the `example_il/` folder.
+The input files for a system consisting of one [C4C1im]+ cation and one [DCA]- anion can be found in the `example_il/` folder.
 
 1. Use `fftool` to create `data.lmp`, `in.lmp` and `pair.lmp` files. A separate `pair.lmp` file containing all i-j pair coefficients is required for future procedures and can be created using the `-a` option of `fftool`. The detailed instructions on how to use `fftool` can be found [here](https://github.com/agiliopadua/fftool).
 
@@ -206,7 +206,7 @@ The input files for a system consiting of one [C4C1im]+ cation and one [DCA]- an
 
 The input files of a system consisting of one ethylammonium nitrate ion pair can be found in the `example_pil/` folder.
 
-1. Steps 1-3 are identical to the ones of the **Example 1**.
+1. Steps 1-3 are identical to the ones of **Example 1**.
 
         fftool 1 N2000.zmat 1 no3.zmat -b 20
         packmol <pack.inp
@@ -214,7 +214,7 @@ The input files of a system consisting of one ethylammonium nitrate ion pair can
         python polarizer.py N2000.zmat no3.zmat -f alpha.ff -q
         python scaleLJ.py -q 
 
-    Here the modification of the parameters of LJ interactions between N2000 and NO3 fragments is performed using the scaling factor obtained through SAPT calculation invoked with the `-q` option.
+    Here modification of the parameters of LJ interactions between N2000 and NO3 fragments is performed using the scaling factor obtained through SAPT calculation (invoked with the `-q` option).
 
 2. Add short range damping of charge-dipole Coulomb interactions between small, highly charged atoms (such as hydrogen) and induced dipoles to prevent the "polarization catastrophe".
 
@@ -224,9 +224,9 @@ The input files of a system consisting of one ethylammonium nitrate ion pair can
     
     <img src="https://render.githubusercontent.com/render/math?math=f(r) = 1 - c \cdot e^{-b r} \sum_{k=0}^4 \frac{(b r)^k}{k!}">
 
-    resulting from an adaptation to the Coulomb interaction of the damping function originally proposed by Tang Toennies for van der Waals interactions. The `b` value is set to 4.5 and the `c` value to 1.0. This function is implemented as a `coul/tt` pair style in LAMMPS (version 29Oct20 or newer), the detailed discription is given [here](https://lammps.sandia.gov/doc/pair_coul_tt.html). 
+    resulting from an adaptation to the Coulomb interaction of the damping function originally proposed by Tang Toennies for van der Waals interactions. The `b` value is set to 4.5 and the `c` value to 1.0. This function is implemented as `coul/tt` pair style in LAMMPS (version 29Oct20 or newer), the detailed description is given [here](https://lammps.sandia.gov/doc/pair_coul_tt.html). 
 
-    The script requires the `data.lmp` file to obtain the list of atoms and their type (polarisable or nonpolarisable). 
+    The script requires the `data-p.lmp` file to obtain the list of atoms and their type (polarisable or non-polarisable). 
 
         1   13.607  # N1 DC
         2   11.611  # C1N DC
@@ -242,7 +242,7 @@ The input files of a system consisting of one ethylammonium nitrate ion pair can
        12    0.400  # NO DP
        13    0.400  # ON DP
 
-    The atomic indices of small, highly charged atoms (typically, point charges without LJ sites) should be specified with the `-a` option. The short range Coulomb interactions of those atoms with all Drude cores and Drude partiles should be damped. The corresponding `pair_coeff` lines are appended to the `pair-p-sc.lmp` file.
+    The atomic indices of small, highly charged atoms (typically, point charges without LJ sites) should be specified with the `-a` option. The short-range Coulomb interactions of those atoms with all Drude cores and Drude particles should be damped. The corresponding `pair_coeff` lines are appended to the `pair-p-sc.lmp` file.
 
         pair_coeff    1    3 coul/tt 4.5 1.0
         pair_coeff    2    3 coul/tt 4.5 1.0
@@ -261,13 +261,13 @@ The input files of a system consisting of one ethylammonium nitrate ion pair can
 
 3. Modify the LJ interaction parameters of particular i-j pairs involved into hydrogen bond formation, if necessary.
 
-    The hydrogen bonds (D-H...A) formed between hydrogen atoms represented by 'naked' charges without a Lennard-Jones sites could lead to "freezing" of a system when modelled using polarisable force field. To avoid this effect, the repulsive potential between D and A sites should be adjusted with a typical value of the sigma parameter of 3.75 - 3.80 Å.
+    The hydrogen bonds (D-H...A) involving hydrogen atoms represented by 'naked' charges without Lennard-Jones sites could lead to "freezing" of a system when modelled using polarisable force field. To avoid this effect, the repulsive potential between D and A sites should be adjusted with a typical value of the sigma parameter of 3.75 - 3.80 Å.
 
     In EAN, the hydrogen bond is formed between HN hydrogens atoms of the cation embedded into neighbouring N1 nitrogen atoms and the ON oxygen atoms of the anion. The sigma LJ parameter of the N1-ON interaction should be increased from 3.10 Å to 3.75 Å.
 
     <img src="example_pil/ean.png" alt="ean" width="300"/>
 
-    The `pair_coeff` line of the interaction between N1 and ON atoms in the `pair-p-sc.lmp` file
+    The `pair_coeff` parameters of the interaction between N1 and ON atoms in the `pair-p-sc.lmp` file
 
         pair_coeff    1    8 lj/cut/coul/long     0.037789     3.101612  # N1 ON 
         
