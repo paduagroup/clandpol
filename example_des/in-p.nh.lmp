@@ -1,0 +1,63 @@
+# created by fftool
+
+units real
+boundary p p p
+
+atom_style full
+bond_style harmonic
+angle_style harmonic
+dihedral_style opls
+
+special_bonds lj/coul 0.0 0.0 0.5
+
+pair_style hybrid/overlay lj/cut/coul/long 12.0 12.0 coul/long/cs 12.0 thole 2.600 12.0 coul/tt 4 12.0
+pair_modify tail yes
+kspace_style pppm 1.0e-5
+
+read_data data-p.lmp
+include pair-p-sc.lmp
+
+group ATOMS type 1 2 3 4 5 6 7 8 9 10 11 12 13
+group CORES type 1 2 4 5 7 9 10 11
+group DRUDES type 14 15 16 17 18 19 20 21
+
+fix DRUDE all drude C C N C C N C N C C C N N D D D D D D D D
+
+#minimize 1.0e-4 1.0e-6 100 1000
+#reset_timestep 0
+
+fix SHAKE ATOMS shake 0.0001 20 0 b 2 5
+
+neighbor 2.0 bin
+#neigh_modify delay 0 every 1 check yes
+
+timestep 1.0
+
+variable TK equal 298.0
+variable TDK equal 1.0
+
+comm_modify vel yes
+velocity ATOMS create ${TK} 12345
+
+compute TATOM ATOMS temp
+compute TDRUDE all temp/drude
+
+fix DTDIR all drude/transform/direct
+fix TSTAT ATOMS nvt temp ${TK} ${TK} 200
+fix TSTDR DRUDES nvt temp ${TDK} ${TDK} 50
+fix DTINV all drude/transform/inverse
+
+fix ICECUBE all momentum 1000 linear 1 1 1
+
+thermo_style custom step time cpu etotal ke pe ebond eangle evdwl ecoul elong &
+  press vol density c_TATOM c_TDRUDE[1] c_TDRUDE[2]
+thermo 5000
+
+dump TRAJ all custom 5000 dump.lammpstrj id mol type element q xu yu zu
+dump_modify TRAJ element N C H C C H O H Cl C O H H D D D D D D D D sort id
+
+restart 50000 restart1.lmp restart2.lmp
+
+run 100000
+
+write_data data-p.eq.lmp
