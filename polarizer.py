@@ -88,7 +88,7 @@ def bdtline(bdt):
                                                      bdt['r0'], bdt['note'])
 
 def atomline(at):
-    return "{0:7d} {1:7d} {2:4d} {3:8.4f} {4:13.6e} {5:13.6e} {6:13.6e} "\
+    return "{0:7d} {1:7d} {2:4d} {3:10.6f} {4:13.6e} {5:13.6e} {6:13.6e} "\
            " {7}\n".format(at['n'], at['mol'], at['id'], at['q'],
                            at['x'], at['y'], at['z'], at['note'])
 
