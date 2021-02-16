@@ -9,6 +9,7 @@ import sys
 import argparse
 import random
 import math
+import shutil
 from copy import deepcopy
 
 
@@ -87,7 +88,7 @@ def bdtline(bdt):
                                                      bdt['r0'], bdt['note'])
 
 def atomline(at):
-    return "{0:7d} {1:7d} {2:4d} {3:8.4f} {4:13.6e} {5:13.6e} {6:13.6e} "\
+    return "{0:7d} {1:7d} {2:4d} {3:10.6f} {4:13.6e} {5:13.6e} {6:13.6e} "\
            " {7}\n".format(at['n'], at['mol'], at['id'], at['q'],
                            at['x'], at['y'], at['z'], at['note'])
 
@@ -595,8 +596,18 @@ class Data(object):
                     jfound = False
                 ifound = False
         
+<<<<<<< HEAD
 
     def lmpscript(self, drude, outdfile, thole = 2.6, cutoff = 12.0):
+=======
+    def concatenatepairfile (self, inpfile, outpfile, pairfile):
+        with open(outpfile, 'wb') as wfd:
+            for f in [inpfile, pairfile]:
+                with open(f, 'rb') as fd:
+                    shutil.copyfileobj(fd, wfd)
+    
+    def lmpscript(self, drude, outfile, inpfile, outpfile, thole = 2.6, cutoff = 12.0):
+>>>>>>> upstream/master
         """print lines for input script, including pair_style thole"""
 
         pairfile = "pair-drude.lmp"
@@ -623,7 +634,12 @@ class Data(object):
         print("# Thole damping recommended if more than 1 Drude per molecule")
         print("include {0}\n".format(pairfile))
 
+<<<<<<< HEAD
         self.writepairfile(pairfile, drude, thole, att['id'])
+=======
+        self.writepairfile (pairfile,drude,thole,att['id'])
+        self.concatenatepairfile (inpfile, outpfile, pairfile)
+>>>>>>> upstream/master
 
         print("# convenient atom groups (for shake, thermostats...)")
         gatoms = gcores = gdrudes = ""
@@ -680,7 +696,6 @@ class Data(object):
         print("#    alternatively pair lj/cut/thole/long could be used "\
               "avoiding hybrid/overlay and")
         print("#    allowing mixing; see doc pages.")
-
 
 # --------------------------------------
 
@@ -1215,7 +1230,11 @@ def main():
                         help = 'input LAMMPS data file (default: data.lmp)')
     parser.add_argument('-od', '--outdfile', default = 'data-p.lmp',
                         help = 'output LAMMPS data file (default: data-p.lmp)')
-
+    parser.add_argument('-ip', '--inpfile', default = 'pair.lmp',
+                        help = 'input LAMMPS pair file (default: pair.lmp)')
+    parser.add_argument('-op', '--outpfile', default = 'pair-p.lmp',
+                        help = 'output LAMMPS pair file (default: pair-p.lmp)')
+    
     args = parser.parse_args()
 
     if args.qcalc:
@@ -1230,7 +1249,7 @@ def main():
     drude = Drude(sys, args.ffdrude, polar, args.positive, args.metal)
     if not args.depolarize:
         data.polarize(drude)
-        data.lmpscript(drude, args.outdfile, args.thole, args.cutoff)
+        data.lmpscript(drude, args.outdfile, args.inpfile, args.outpfile, args.thole, args.cutoff)
     else:
         data.depolarize(drude)
     data.write(args.outdfile)
