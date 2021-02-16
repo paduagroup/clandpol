@@ -184,11 +184,12 @@ Scaled epsilon (and sigma) values for LJ interaction are printed into a `pair-p-
     c4h10        dca            0.69      0.72
     ------------------------------------------
 
-### Example 2. Protic ionic liquid (or any other strongly H-bonded system)
+
+### Example 2. Protic ionic liquid (or other strongly H-bonded systems)
 
 The input files of a system consisting of one ethylammonium nitrate ion pair can be found in the `example_pil/` folder.
 
-#### 1. Steps 1-3 are identical to the ones of Example 1
+#### 1. Steps 1 to 3 are identical to Example 1
 
     fftool 1 N2000.zmat 1 no3.zmat -b 20
     packmol <pack.inp
@@ -239,7 +240,7 @@ Here, the damped interactions are the ones of the HN atom (index 3) with Drude c
 
 The script prints the command to be included by the user to the `in-p.lmp` file to declare the `coul/tt` pair style. 
 
-    To inlcude to in-p.lmp:
+    To inlcude in in-p.lmp:
 	    pair_style hybrid/overlay ... coul/tt 4 12.0
 
 #### 3. Modify the LJ interaction parameters of i-j pairs involved in hydrogen bonds
