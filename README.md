@@ -59,7 +59,7 @@ Use `fftool` to create `data.lmp`, `in.lmp` and `pair.lmp` files. A separate `pa
     fftool 1 c4c1im.zmat 1 dca.zmat -b 20 -a -l
 
 
-#### 2. Add Drude induced dipoles to LAMMPS data file using the `polarizer.py` script.
+#### 2. Add Drude induced dipoles to LAMMPS data file
 
     python polarizer.py c4c1im.zmat dca.zmat -f alpha.ff -q -id data.lmp -od data-p.lmp
 
@@ -135,7 +135,8 @@ This script then adds new atom types, new bond types, new atoms and new bonds in
 
 Pair i-j interactions between induced dipoles are described by `pair_coeff` in `pair-drude.lmp`. The script creates these files and concatenates `pair.lmp` and `pair-drude.lmp` files into `pair-p.lmp`, which is used for the next step.
 
-#### 3. Scale parameters of LJ interactions between fragments  using the `scaleLJ.py` script
+
+#### 3. Scale LJ interactions between fragments
 
     python scaleLJ.py -f fragment.ff -a alpha.ff -i fragment.inp -ip pair-p.lmp -op pair-p-sc.lmp
 
@@ -143,7 +144,7 @@ The script performs modification of Lennard-Jones interaction between atoms of t
 
 The script requires several input files with fragment specification, structure files of fragments in common formats (`.xyz`, `.zmat`, `.mol`, `.pdb`), and the `pair-p.lmp` file.
 
-Format of file containing specification of monomers and dimers:
+The file containing specification of monomers and dimers has the following format:
 
     # fragment.ff
     MONOMERS
@@ -161,6 +162,8 @@ where
     * `m1` and `m2` are the monomers forming a dimer,
     * `r_COM` is the distance between the centers of mass of the monomers,
     * `k_sapt` is the scaling factor for the epsilon of LJ potential, obtained by SAPT quantum calculation (optional).
+
+If equilibrium distances are missing for certain fragment dimers, these can be obtained from a geometry optimization (we used dispersion-corrected DFT, B97+D3/cc-pVTZ). Charges and dipole moments for new fragments can be calculated using quantum chemistry (we used the level MP2/cc-pVTZ). Details are given in the [CL&Pol] paper.
 
 Format of file containing fragment list with atomic type indices:
 
@@ -270,7 +273,7 @@ should be replaced by
   117 (1995) 1, DOI:
   [10.1006/jcph.1995.1039](http://dx.doi.org/10.1006/jcph.1995.1039)
 
-* CL&Pol: K. Goloviznina, J. N. Canongia Lopes, M. Costa Gomes, A. A. H. Pádua,  J. Chem. Theory Comput. 15 (2019), 5858, DOI:
+* [CL&Pol](https://doi.org/10.1021/acs.jctc.9b00689): K. Goloviznina, J. N. Canongia Lopes, M. Costa Gomes, A. A. H. Pádua,  J. Chem. Theory Comput. 15 (2019), 5858, DOI:
   [10.1021/acs.jctc.9b00689](https://doi.org/10.1021/acs.jctc.9b00689), arXiv [1703.01540](https://arxiv.org/abs/1703.01540)
 
 * CL&Pol for PIL, DES, electrolytes: K. Goloviznina, Z. Gong, M. Costa Gomes,
