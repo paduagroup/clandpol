@@ -170,10 +170,10 @@ Scaled epsilon (and sigma) values for LJ interaction are printed into a `pair-p-
     Sigma LJ parameters were not scaled.
     ------------------------------------------
     Fragment1    Fragment2    k_sapt    k_pred
-    c2c1im       c4h10        0.76      0.78
-    c2c1im       dca          0.61      0.68
-    c4h10        c4h10        0.94      1.00
-    c4h10        dca          0.69      0.72
+    c2c1im       c4h10          0.76      0.78
+    c2c1im       dca            0.61      0.68
+    c4h10        c4h10          0.94      1.00
+    c4h10        dca            0.69      0.72
     ------------------------------------------
 
 ## References
