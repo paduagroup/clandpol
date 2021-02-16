@@ -54,7 +54,7 @@ Use `fftool` to create `data.lmp`, `in.lmp` and `pair.lmp` files. A separate `pa
 
     python polarizer.py c4c1im.zmat dca.zmat -f alpha.ff -q -id data.lmp -od data-p.lmp
 
-    The script requires a file containing the specification of Drude induced dipoles according to the following format, and specified with the `-f` option:
+The script requires a file containing the specification of Drude induced dipoles according to the following format, and specified with the `-f` option:
 
     # alpha.ff
     type  dm/u  dq/e  k/(kJ/molA2)  alpha/A3  thole
