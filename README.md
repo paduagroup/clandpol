@@ -46,7 +46,7 @@ A system consisting of one [C4C1im]+ cation and one [DCA]- anion is considered a
 Use `fftool` to create `data.lmp`, `in.lmp` and `pair.lmp` files. A separate `pair.lmp` file containing all i-j pair coefficients is required for future procedures and can be created using the `-a` option of `fftool`. The detailed instructions on how to use `fftool` can be found [here](https://github.com/agiliopadua/fftool).
 
     fftool 1 c4c1im.zmat 1 dca.zmat -b 20
-    packmol <pack.inp
+    packmol < pack.inp
     fftool 1 c4c1im.zmat 1 dca.zmat -b 20 -a -l
 
 
@@ -58,8 +58,8 @@ The script requires a file containing the specification of Drude induced dipoles
 
     # alpha.ff
     type  dm/u  dq/e  k/(kJ/molA2)  alpha/A3  thole
-    CR      0.4    -1.0     4184.0   1.122   2.6    
-    NA      0.4    -1.0     4184.0   1.208   2.6
+    CR    0.4   -1.0     4184.0     1.122     2.6
+    NA    0.4   -1.0     4184.0     1.208     2.6
     ...
 
 where
@@ -139,12 +139,12 @@ Format of file containing specification of monomers and dimers:
 
     # fragment.ff
     MONOMERS
-    # name       q/e       mu/D
+    # name       q/e      mu/D
     c2c1im       1.0      1.1558
     ...
     DIMERS
     # m1         m2       r_COM/A    k_sapt
-    c2c1im       dca       2.935      0.61
+    c2c1im       dca      2.935      0.61
     ...
 
 where
@@ -154,13 +154,13 @@ where
     * `r_COM` is the distance between the centers of mass of the monomers,
     * `k_sapt` is the scaling factor for the epsilon of LJ potential, obtained by SAPT quantum calculation (optional).
 
-Format of file containing fragment list with atomic indices:
+Format of file containing fragment list with atomic type indices:
 
     # fragment.inp
     # c4c1im dca
-    c2c1im 1:8
-    C4H10  9:12
-    dca   13:15
+    c2c1im  1:8
+    C4H10   9:12
+    dca    13:15
 
 where atomic indices or/and a range of indices correspond to atomic types associating with this fragment in the `data.lmp` file. In this example, NA, CR, CW, C1, HCR, C1A, HCW, H1 belong to the c2c1im fragment; C2, CS, HC, CT are from the C4H10 fragment and N3A, CZA, NZA are from the dca fragment. Thus, the script requires `c2c1im.zmat`, `C4H10.zmat` and `dca.zmat` structure files.
 
@@ -168,13 +168,13 @@ Scaled epsilon (and sigma) values for LJ interaction are printed into a `pair-p-
 
     Epsilon LJ parameters were scaled by k_pred parameter. Changes are marked with '~'.
     Sigma LJ parameters were not scaled.
-    ----------------------------------------------
-    Fragment1   Fragment2    k_sapt     k_pred
-    c2c1im      c4h10        0.76       0.78
-    c2c1im      dca          0.61       0.68
-    c4h10       c4h10        0.94       1.00
-    c4h10       dca          0.69       0.72
-    ----------------------------------------------
+    ------------------------------------------
+    Fragment1    Fragment2    k_sapt    k_pred
+    c2c1im       c4h10        0.76      0.78
+    c2c1im       dca          0.61      0.68
+    c4h10        c4h10        0.94      1.00
+    c4h10        dca          0.69      0.72
+    ------------------------------------------
 
 ## References
 ----------

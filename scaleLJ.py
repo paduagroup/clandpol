@@ -2,7 +2,7 @@
 # scaleLJ.py - scale epsilon and sigma LJ parameters in pair.lmp LAMMPS file.
 # Agilio Padua <agilio.padua@ens-lyon.fr>
 # Kateryna Goloviznina <kateryna.goloviznina@ens-lyon.fr>
-# version 2019/12/12
+# version 2021/02/16
 
 import sys
 import math
@@ -448,7 +448,7 @@ class System(object):
         return res
 
     # call a function to get atom list for fragments based on existing atom type 
-    def GetFragAtoms(self,pol):
+    def GetFragAtoms(self, pol):
         try:
             for fr in self.fragments:
                 if os.path.exists('./'+fr.name+'.zmat'):
@@ -473,7 +473,7 @@ class System(object):
 # class with static functions to scale sigma and epsilon in pair-p.lmp and print output file             
 class ScaleLJ(object):
     @staticmethod
-    def Scale(pair_in_file,ff,mol,sapt,scsig):
+    def Scale(pair_in_file, ff, mol, sapt, scsig):
         try:
             res= []
             for line in open(pair_in_file, 'r'):
@@ -522,7 +522,7 @@ class ScaleLJ(object):
             for line in res:
                 f.write(line+'\n')
 
-def PrintReport(sys,sapt,scsig):
+def PrintReport(sys, sapt, scsig):
     report = "Epsilon LJ parameters were scaled by "
     if sapt:
         report += "k_sapt"
@@ -536,22 +536,22 @@ def PrintReport(sys,sapt,scsig):
     else:
         report +="were scaled by %5.3f value for all the fragments. Changes are marked with '*'.\n" %  _Const.sigma_k
 
-    report += '--------------------------------------------------------------------\n'
+    report += '------------------------------------------\n'
 
-    report += ' Fragment1\t Fragment2\t  k_sapt'
+    report += 'Fragment1    Fragment2    k_sapt'
     if not sapt:
-        report += '\t k_pred'
+        report += '    k_pred'
 
     for frp in sys.fragmentpairs:
-        report += '\n%10s\t%10s' % (frp.fr1.name, frp.fr2.name)
+        report += '\n%-10s   %-10s' % (frp.fr1.name, frp.fr2.name)
         if sapt:
-            report += '\t  %6.2f' % frp.k_sapt
+            report += '  %6.2f' % frp.k_sapt
         elif frp.k_sapt is None:
-            report += '\t %7s \t %6.2f' % ('-',frp.k_pred)
+            report += '   %6s    %6.2f' % ('-',frp.k_pred)
         else:
-            report += '\t  %6.2f \t %6.2f' % (frp.k_sapt,frp.k_pred)
+            report += '   %6.2f    %6.2f' % (frp.k_sapt,frp.k_pred)
 
-    report += '\n--------------------------------------------------------------------'
+    report += '\n------------------------------------------'
     print(report)
 
 def main():
