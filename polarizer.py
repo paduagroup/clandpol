@@ -596,10 +596,6 @@ class Data(object):
                     jfound = False
                 ifound = False
         
-<<<<<<< HEAD
-
-    def lmpscript(self, drude, outdfile, thole = 2.6, cutoff = 12.0):
-=======
     def concatenatepairfile (self, inpfile, outpfile, pairfile):
         with open(outpfile, 'wb') as wfd:
             for f in [inpfile, pairfile]:
@@ -607,7 +603,6 @@ class Data(object):
                     shutil.copyfileobj(fd, wfd)
     
     def lmpscript(self, drude, outfile, inpfile, outpfile, thole = 2.6, cutoff = 12.0):
->>>>>>> upstream/master
         """print lines for input script, including pair_style thole"""
 
         pairfile = "pair-drude.lmp"
@@ -634,12 +629,8 @@ class Data(object):
         print("# Thole damping recommended if more than 1 Drude per molecule")
         print("include {0}\n".format(pairfile))
 
-<<<<<<< HEAD
         self.writepairfile(pairfile, drude, thole, att['id'])
-=======
-        self.writepairfile (pairfile,drude,thole,att['id'])
         self.concatenatepairfile (inpfile, outpfile, pairfile)
->>>>>>> upstream/master
 
         print("# convenient atom groups (for shake, thermostats...)")
         gatoms = gcores = gdrudes = ""
