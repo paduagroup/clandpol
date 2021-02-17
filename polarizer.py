@@ -602,7 +602,7 @@ class Data(object):
                 with open(f, 'rb') as fd:
                     shutil.copyfileobj(fd, wfd)
     
-    def lmpscript(self, drude, outfile, inpfile, outpfile, thole = 2.6, cutoff = 12.0):
+    def lmpscript(self, drude, outdfile, inpfile, outpfile, thole = 2.6, cutoff = 12.0):
         """print lines for input script, including pair_style thole"""
 
         pairfile = "pair-drude.lmp"
