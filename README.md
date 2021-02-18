@@ -146,8 +146,8 @@ The script performs modification of Lennard-Jones interaction between atoms of t
 
     python scaleLJ.py [...] -s                   - scale all fragments' sigma by 0.985
     python scaleLJ.py [...] -s 0.9               - scale all fragments' sigma by a user-defined value
-    python scaleLJ.py [...] -s c2c1im [...]      - scale the specified fragments' sigma by 0.985
-    python scaleLJ.py [...] -s 0.9 c2c1im [...]  - scale the specified fragments' sigma by a user-defined value
+    python scaleLJ.py [...] -s c2c1im c4h10      - scale the specified fragments' sigma by 0.985
+    python scaleLJ.py [...] -s 0.9 c2c1im c4h10  - scale the specified fragments' sigma by a user-defined value
 
 The script requires several input files with fragment specification, structure files of fragments in common formats (`.xyz`, `.zmat`, `.mol`, `.pdb`), and the `pair-p.lmp` file.
 
