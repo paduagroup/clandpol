@@ -45,9 +45,9 @@ def WritePairFile(pfile, hatoms, cores, dp):
             f.write(line+'\n')
 
 def WriteInputFile(pfile):
-    print('\nTo inlcude to in-p.lmp:')
-    print('    pair_style hybrid/overlay ... coul/tt 4 12.0')
-    print('    include {0}\n'.format(pfile))
+    print('To inlcude to in-p.lmp:')
+    print('    pair_style hybrid/overlay [...] coul/tt 4 12.0')
+    print('    include {0}'.format(pfile))
 
 def main():
     parser = argparse.ArgumentParser( description = 'Automatic coul/tt pair style generator')

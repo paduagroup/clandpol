@@ -558,7 +558,8 @@ class Data(object):
             f.write("# interactions involving Drude particles\n")
             f.write("pair_coeff    * {0:3d}* coul/long/cs\n".format(att_id))
 
-            f.write("# Thole damping if more than 1 Drude per molecule\n")
+            f.write("# Thole dipole-dipole damping if more than "\
+                    "1 Drude per molecule\n")
             # Thole parameters for I,J pairs
             ifound = False
             for atti in self.atomtypes:
@@ -595,14 +596,8 @@ class Data(object):
                                                         alphaij, tholeij))
                     jfound = False
                 ifound = False
-        
-    def concatenatepairfile (self, inpfile, outpfile, pairfile):
-        with open(outpfile, 'wb') as wfd:
-            for f in [inpfile, pairfile]:
-                with open(f, 'rb') as fd:
-                    shutil.copyfileobj(fd, wfd)
-    
-    def lmpscript(self, drude, outdfile, inpfile, outpfile, thole = 2.6, cutoff = 12.0):
+          
+    def lmpscript(self, drude, outdfile, thole = 2.6, cutoff = 12.0):
         """print lines for input script, including pair_style thole"""
 
         inpstack = "in-p.lmp"
@@ -619,8 +614,12 @@ class Data(object):
 
         print("Commands for the LAMMPS input script to handle "\
               "polarization written to " + inpstack)
+        print("Pair coefficients for Thole damping "\
+              "written to " + pairfile)
+        print("Simulation box "\
+              "written to " + outdfile)
 
-        with open(inpstack, 'x') as f:
+        with open(inpstack, 'w') as f:
             f.write("# Commands to include in the LAMMPS input stack\n\n")
 
             f.write("# adapt the pair_style command as needed\n")
@@ -636,7 +635,6 @@ class Data(object):
             f.write("include {0}\n\n".format(pairfile))
 
             self.writepairfile(pairfile, drude, thole, att['id'])
-            self.concatenatepairfile (inpfile, outpfile, pairfile)
 
             f.write("# convenient atom groups (for shake, thermostats...)\n")
             gatoms = gcores = gdrudes = ""
@@ -736,6 +734,9 @@ class Drude(object):
 
                 #skip H
                 if tok[0].startswith('H'):
+                    tmp_alpha_H = float(tok[4])
+                    if tmp_alpha_H != self.alpha_H:
+                        raise Exception('  error: atomic polarisability of hydrogen atoms should have unique value ({0:5.3f} and {0:5.3f} found)'.format(self.alpha_H, tmp_alpha_H))
                     continue
 
                 drude = {}
@@ -746,11 +747,9 @@ class Drude(object):
                 alpha = float(tok[4]) # polarisability without H
                 drude['thole'] = float(tok[5])
 
-                # check if there are H arrached to the atom; if yes, merge their polarisability
+                # check if there are H attached to the atom; if yes, merge their polarisability
                 alpha += self.alpha_H*sys.countH(drude['type'])
                 drude['alpha'] = alpha
-                
-                #print(drude['type'],alpha,sys.countH(drude['type']),alpha + self.alpha_H*sys.countH(drude['type']))
 
                 if polar == 'q':
                     dq = (fpe0 * k * alpha)**0.5
@@ -799,7 +798,7 @@ class System(object):
             if len(dr_atoms) > 0:
                 nH0 = dr_atoms[0].nH
                 if next((x for x in dr_atoms if x.nH != nH0), None) is not None:
-                    raise Exception('  error: atom type %s has different number of hydrogens attached in structure files' % dtype)
+                    raise Exception('  error: atom type {0} has different number of hydrogens attached in structure files'.format(dtype))
             return nH0
 
         except Exception as e:
@@ -869,7 +868,7 @@ class atom(object):
         self.nH = 0
 
     def __str__(self):
-        return '%s %s \t %d H' %(self.name, self.atype, self.nH)
+        return '{0} {1} \t {2:4d} H'.format(self.name, self.atype, self.nH)
 
 # --------------------------------------
 
@@ -886,7 +885,7 @@ class bond(object):
         return delta < BondTol
 
     def __str__(self):
-        return '%s-%s %6.4f' % (self.i.name, self.j.name, self.r)
+        return '{0}-{1} {2:6.4f}'.format(self.i.name, self.j.name, self.r)
 
 # --------------------------------------
 
@@ -1225,10 +1224,6 @@ def main():
                         help = 'input LAMMPS data file (default: data.lmp)')
     parser.add_argument('-od', '--outdfile', default = 'data-p.lmp',
                         help = 'output LAMMPS data file (default: data-p.lmp)')
-    parser.add_argument('-ip', '--inpfile', default = 'pair.lmp',
-                        help = 'input LAMMPS pair file (default: pair.lmp)')
-    parser.add_argument('-op', '--outpfile', default = 'pair-p.lmp',
-                        help = 'output LAMMPS pair file (default: pair-p.lmp)')
     
     args = parser.parse_args()
 
@@ -1244,7 +1239,7 @@ def main():
     drude = Drude(sys, args.ffdrude, polar, args.positive, args.metal)
     if not args.depolarize:
         data.polarize(drude)
-        data.lmpscript(drude, args.outdfile, args.inpfile, args.outpfile, args.thole, args.cutoff)
+        data.lmpscript(drude, args.outdfile, args.thole, args.cutoff)
     else:
         data.depolarize(drude)
     data.write(args.outdfile)
