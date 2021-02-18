@@ -135,7 +135,7 @@ This script then adds new atom types, new bond types, new atoms and new bonds in
     #    alternatively pair lj/cut/thole/long could be used avoiding hybrid/overlay and
     #    allowing mixing; see doc pages.
 
-Pair i-j interactions between induced dipoles are described by `pair_coeff` in `pair-drude.lmp`. The `pair.lmp` and `pair-drude.lmp` files can ce concatenated into `pair-p.lmp`, which is used for the next step.
+Pair i-j interactions between induced dipoles are described by `pair_coeff` in `pair-drude.lmp`. The `pair.lmp` and `pair-drude.lmp` files can be concatenated into `pair-p.lmp`, which is used for the next step.
 
 
 #### 3. Scale LJ interactions between fragments
@@ -187,7 +187,7 @@ Scaled epsilon (and sigma) values for LJ interaction are printed into a `pair-p-
     Epsilon LJ parameters were scaled by k_pred parameter. Changes are marked with '~'.
     Sigma LJ parameters were not scaled.
     ------------------------------------------
-    Fragment1    Fragment2    k_sapt    k_pred
+    Fragment i   Fragment j   k_sapt    k_pred
     c2c1im       c4h10          0.76      0.78
     c2c1im       dca            0.61      0.68
     c4h10        c4h10          0.94      1.00
