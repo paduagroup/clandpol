@@ -605,6 +605,7 @@ class Data(object):
     def lmpscript(self, drude, outdfile, inpfile, outpfile, thole = 2.6, cutoff = 12.0):
         """print lines for input script, including pair_style thole"""
 
+        inpstack = "in-p.lmp"
         pairfile = "pair-drude.lmp"
         
         dfound = False
@@ -613,80 +614,83 @@ class Data(object):
                 dfound = True
                 break
         if not dfound:
-            print("# No polarizable atoms found.")
+            print("No polarizable atoms found.")
             return
 
-        print("# Commands to include in the LAMMPS input script\n")
+        print("Commands for the LAMMPS input script to handle "\
+              "polarization written to " + inpstack)
 
-        print("# adapt the pair_style command as needed")
-        print("pair_style hybrid/overlay [...] coul/long/cs {0:.1f} "\
-              "thole {1:.3f} {0:.1f}\n".format(cutoff, thole))
+        with open(inpstack, 'x') as f:
+            f.write("# Commands to include in the LAMMPS input stack\n\n")
 
-        print("# new data file with Drude oscillators added")
-        print("read_data {0}\n".format(outdfile))
+            f.write("# adapt the pair_style command as needed\n")
+            f.write("pair_style hybrid/overlay [...] coul/long/cs {0:.1f} "\
+                  "thole {1:.3f} {0:.1f}\n\n".format(cutoff, thole))
 
-        print("# read pair interactions involving Drude particles")
-        print("# Thole damping recommended if more than 1 Drude per molecule")
-        print("include {0}\n".format(pairfile))
+            f.write("# new data file with Drude oscillators added\n")
+            f.write("read_data {0}\n\n".format(outdfile))
 
-        self.writepairfile(pairfile, drude, thole, att['id'])
-        self.concatenatepairfile (inpfile, outpfile, pairfile)
+            f.write("# read pair interactions involving Drude particles\n")
+            f.write("# Thole damping recommended if more than 1 Drude "\
+                    "per molecule\n")
+            f.write("include {0}\n\n".format(pairfile))
 
-        print("# convenient atom groups (for shake, thermostats...)")
-        gatoms = gcores = gdrudes = ""
-        for att in self.atomtypes:
-            if att['dflag'] != 'd':
-                gatoms += " {0}".format(att['id'])
-            if att['dflag'] == 'c':
-                gcores += " {0}".format(att['id'])
-            if att['dflag'] == 'd':
-                gdrudes += " {0}".format(att['id'])
-        print("group ATOMS type" + gatoms)
-        print("group CORES type" + gcores)
-        print("group DRUDES type" + gdrudes)
-        print("")
+            self.writepairfile(pairfile, drude, thole, att['id'])
+            self.concatenatepairfile (inpfile, outpfile, pairfile)
 
-        print("# identify each atom type: [C]ore, [D]rude, [N]on-polarizable")
-        drudetypes = ""
-        for att in self.atomtypes:
-            drudetypes += " {0}".format(att['dflag'].upper())
-        print("fix DRUDE all drude" + drudetypes)
-        print("")
+            f.write("# convenient atom groups (for shake, thermostats...)\n")
+            gatoms = gcores = gdrudes = ""
+            for att in self.atomtypes:
+                if att['dflag'] != 'd':
+                    gatoms += " {0}".format(att['id'])
+                if att['dflag'] == 'c':
+                    gcores += " {0}".format(att['id'])
+                if att['dflag'] == 'd':
+                    gdrudes += " {0}".format(att['id'])
+            f.write("group ATOMS type" + gatoms + "\n")
+            f.write("group CORES type" + gcores + "\n")
+            f.write("group DRUDES type" + gdrudes + "\n\n")
 
-        print("# store velocity information of ghost atoms")
-        print("comm_modify vel yes")
-        print("")
+            f.write("# identify each atom type: "\
+                    "[C]ore, [D]rude, [N]on-polarizable\n")
+            drudetypes = ""
+            for att in self.atomtypes:
+                drudetypes += " {0}".format(att['dflag'].upper())
+            f.write("fix DRUDE all drude" + drudetypes + "\n\n")
 
-        print("variable TK equal 300.0")
-        print("variable TDRUDE equal 1.0")
-        print("variable PBAR equal 1.0")
-        print("")
+            f.write("# store velocity information of ghost atoms\n")
+            f.write("comm_modify vel yes\n\n")
+
+            f.write("variable TK equal 300.0\n")
+            f.write("variable TDRUDE equal 1.0\n")
+            f.write("variable PBAR equal 1.0\n\n")
         
-        print("# temperature-grouped multiple Nose-Hoover thermostats and barostat")
-        print("fix TSTAT all tgnpt/drude temp ${TK} ${TK} 100 ${TDRUDE} 20 iso ${PBAR} ${PBAR} 1000")
-        print("")
+            f.write("# temperature-grouped multiple Nose-Hoover thermostats "\
+                    " and barostat\n")
+            f.write("fix TSTAT all tgnpt/drude temp ${TK} ${TK} 100 "\
+                    "${TDRUDE} 20 iso ${PBAR} ${PBAR} 1000\n\n")
 
-        print("# output the temperatures of molecular COM, COM of DC-DP, and DP")
-        print("thermo_style custom step [...] f_TSTAT[1] f_TSTAT[2] f_TSTAT[3]")
-        print("")
+            f.write("# output the temperatures of molecular COM, "\
+                    "COM of DC-DP, and DP\n")
+            f.write("thermo_style custom step [...] "\
+                    "f_TSTAT[1] f_TSTAT[2] f_TSTAT[3]\n\n")
 
-        i = drudetypes.find("D")
+            i = drudetypes.find("D")
 
-        print("# write Drude particles to dump file")
-        print("dump_modify ... element ... " + drudetypes[i:])
-        print("")
+            f.write("# write Drude particles to dump file\n")
+            f.write("dump_modify ... element ... " + drudetypes[i:] + "\n\n")
 
-        print("# ATTENTION!")
-        print("#  * read_data may need 'extra/special/per/atom' keyword, "
-              "LAMMPS will exit with a message")
-        print("#  * if using fix shake the group-ID must not include "
-              "Drude particles; use group ATOMS")
-        print("#  * give all I<=J pair interactions, no mixing")
-        print("#  * pair style coul/long/cs from CORESHELL package is used "\
-              "for interactions of DP;")
-        print("#    alternatively pair lj/cut/thole/long could be used "\
-              "avoiding hybrid/overlay and")
-        print("#    allowing mixing; see doc pages.")
+            f.write("# ATTENTION!\n")
+            f.write("#  * read_data may need 'extra/special/per/atom' keyword, "
+                  "LAMMPS will exit with a message\n")
+            f.write("#  * if using fix shake the group-ID must not include "
+              "Drude particles; use group ATOMS\n")
+            f.write("#  * give all I<=J pair interactions, no mixing\n")
+            f.write("#  * pair style coul/long/cs from CORESHELL package is "\
+                  "used for interactions of DP;\n")
+            f.write("#    alternatively pair lj/cut/thole/long could be used "\
+                  "avoiding hybrid/overlay and\n")
+            f.write("#    allowing mixing; see doc pages.\n")
 
 # --------------------------------------
 
@@ -720,7 +724,7 @@ class Drude(object):
 
             if not h_found:
                 self.alpha_H = d_alpha_H
-                print('warning: polarisability of H atom is not found. Default value is %5.3f (PCCP 20(2018)10992). ' % d_alpha_H)
+                print('warning: polarisability of H atom is not found. Default value is {0:5.3f} (PCCP 20(2018)10992). '.format(d_alpha_H))
 
             # read all polarisable atoms from the beginning
             f.seek(0)
