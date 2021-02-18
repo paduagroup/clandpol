@@ -248,7 +248,7 @@ The atomic indices of small, highly charged atoms (typically, point charges with
 
 Here, the damped interactions are the ones of the HN atom (index 3) with Drude cores (indices 1, 2, 4, 7, 8) and Drude particles (indices 9-13).
 
-The script prints the command to be included by the user to the `in-p.lmp` file to declare the `coul/tt` pair style.
+The script prints the commands to be included by the user to the `in-p.lmp` file to declare the `coul/tt` pair style.
 
     To inlcude to in-p.lmp:
         pair_style hybrid/overlay ... coul/tt 4 12.0
