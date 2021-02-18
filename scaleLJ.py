@@ -472,7 +472,7 @@ class System(object):
             print(e)  
             sys.exit(1)
 
-    def ParceScaleSigma(self, scsig):
+    def ParseScaleSigma(self, scsig):
         
         if len(scsig) > 0:
             if _Const.isfloat(scsig[0]):
@@ -654,7 +654,7 @@ def main():
     syst.GetFragments(ff,args.polarisable)
 
     if args.scsig is not None:
-        syst.ParceScaleSigma(args.scsig)
+        syst.ParseScaleSigma(args.scsig)
 
     syst.GetFragmentPairs(ff)
 
