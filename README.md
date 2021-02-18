@@ -210,7 +210,7 @@ This is almos always needed between small, highly charged atoms (such as hydroge
 
 The functional form of the damping function is
     
-    <img src="https://render.githubusercontent.com/render/math?math=f(r) = 1 - c \cdot e^{-b r} \sum_{k=0}^4 \frac{(b r)^k}{k!}">
+<img src="https://render.githubusercontent.com/render/math?math=f(r) = 1 - c \cdot e^{-b r} \sum_{k=0}^4 \frac{(b r)^k}{k!}">
 
 resulting from an adaptation to the Coulomb interaction of the damping function originally proposed by Tang Toennies for van der Waals interactions. The `b` value is set to 4.5 and the `c` value to 1.0. This function is implemented as `coul/tt` pair style in LAMMPS (version 29Oct20 or newer), the detailed description is given [here](https://lammps.sandia.gov/doc/pair_coul_tt.html). 
 
@@ -252,7 +252,7 @@ Hydrogen bonds (D-H...A) involving hydrogen atoms represented by 'naked' charges
 
 In EAN, the hydrogen bond is formed between HN hydrogens atoms of the cation embedded into neighbouring N1 nitrogen atoms and the ON oxygen atoms of the anion. The sigma LJ parameter of the N1-ON interaction should be increased from 3.10 Å to 3.75 Å.
 
-    <img src="example_pil/ean.png" alt="ean" width="300"/>
+<img src="example_pil/ean.png" alt="ean" width="300"/>
 
 The `pair_coeff` parameters of the interaction between N1 and ON atoms in the `pair-p-sc.lmp` file
 
