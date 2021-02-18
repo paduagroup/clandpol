@@ -734,7 +734,7 @@ class Drude(object):
                 if tok[0].startswith('H'):
                     tmp_alpha_H = float(tok[4])
                     if tmp_alpha_H != self.alpha_H:
-                        raise Exception('  error: atomic polarisability of hydrogen atoms should have unique value (%5.3f and %5.3f found)' % (self.alpha_H, tmp_alpha_H))
+                        raise Exception('  error: atomic polarisability of hydrogen atoms should have unique value ({0:5.3f} and {0:5.3f} found)'.format(self.alpha_H, tmp_alpha_H))
                     continue
 
                 drude = {}
