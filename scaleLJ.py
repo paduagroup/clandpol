@@ -148,7 +148,7 @@ class Forcefield(object):
                         r = float (tok[2])
 
                         if next((x for x in self.dimers if (x.m1.name == m1_name and x.m2.name == m2_name) or (x.m1.name == m2_name and x.m2.name  == m1_name)), None):
-                            raise Exception('  error: dimer {0} {1} is specified twice in {3}'.format(m1_name, m2_name, self.filename))
+                            raise Exception('  error: dimer {0} {1} is specified twice in {2}'.format(m1_name, m2_name, self.filename))
 
                         d = self.SetDimer(m1_name, m2_name)
                         self.dimers.append(d)
@@ -176,7 +176,7 @@ class Forcefield(object):
                 d = Dimer(m1, m2)
                 return d
             else:
-                raise Exception('  error: monomer {0} or monomer {1} not descibed in monomers section of {3}'.format(m1_name, m2_name, self.filename))
+                raise Exception('  error: monomer {0} or monomer {1} not descibed in monomers section of {2}'.format(m1_name, m2_name, self.filename))
 
         except Exception as e:
             print(e)
@@ -465,7 +465,7 @@ class System(object):
                         if d is not None:
                             self.fragmentpairs.append(FragmentPair(self.fragments[i],self.fragments[j],d.r,d.k_sapt))
                         else:
-                            raise Exception('  error: dimer {0} {1} not found in {3}'.format(self.fragments[i].name,self.fragments[j].name, ff.filename))
+                            raise Exception('  error: dimer {0} {1} not found in {2}'.format(self.fragments[i].name,self.fragments[j].name, ff.filename))
                     j+=1
                 i+=1
         except Exception as e:
@@ -554,7 +554,7 @@ class ScaleLJ(object):
                     elif frp.k_sapt is not None:
                         k = frp.k_sapt
                     else:
-                        raise Exception('  error: k_sapt for {0} {1} dimer not found in {3}'.format(frp.fr1.name, frp.fr2.name, ff.filename))                   
+                        raise Exception('  error: k_sapt for {0} {1} dimer not found in {2}'.format(frp.fr1.name, frp.fr2.name, ff.filename))                   
                     if ((i in frp.fr1.ind_range and j in frp.fr2.ind_range) or (j in frp.fr1.ind_range and i in frp.fr2.ind_range)) and k < 1:
                         eps *= k
                         com += ' ~'
