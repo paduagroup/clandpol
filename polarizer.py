@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # polarizer.py - add Drude oscillators to LAMMPS data file.
 # Agilio Padua <agilio.padua@ens-lyon.fr>
-# Alain Dequidt <alain.dequidt@univ-bpclermont.fr>
+# Alain Dequidt <alain.dequidt@uca.fr>
 # Kateryna Goloviznina <kateryna.goloviznina@ens-lyon.fr>
-# version 2019/12/12
+# version 2021/02/16
 
 import sys
 import argparse
@@ -602,7 +602,7 @@ class Data(object):
                 with open(f, 'rb') as fd:
                     shutil.copyfileobj(fd, wfd)
     
-    def lmpscript(self, drude, outfile, inpfile, outpfile, thole = 2.6, cutoff = 12.0):
+    def lmpscript(self, drude, outdfile, inpfile, outpfile, thole = 2.6, cutoff = 12.0):
         """print lines for input script, including pair_style thole"""
 
         pairfile = "pair-drude.lmp"
@@ -622,18 +622,17 @@ class Data(object):
         print("pair_style hybrid/overlay [...] coul/long/cs {0:.1f} "\
               "thole {1:.3f} {0:.1f}\n".format(cutoff, thole))
 
-        print("# data file with Drude oscillators added")
-        print("read_data {0}\n".format(outfile))
+        print("# new data file with Drude oscillators added")
+        print("read_data {0}\n".format(outdfile))
 
-        print("# pair interactions with Drude particles written to file")
+        print("# read pair interactions involving Drude particles")
         print("# Thole damping recommended if more than 1 Drude per molecule")
         print("include {0}\n".format(pairfile))
 
-        self.writepairfile (pairfile,drude,thole,att['id'])
+        self.writepairfile(pairfile, drude, thole, att['id'])
         self.concatenatepairfile (inpfile, outpfile, pairfile)
 
-        print("# atom groups convenient for thermostats (see package "
-              "documentation), etc.")
+        print("# convenient atom groups (for shake, thermostats...)")
         gatoms = gcores = gdrudes = ""
         for att in self.atomtypes:
             if att['dflag'] != 'd':
@@ -647,7 +646,7 @@ class Data(object):
         print("group DRUDES type" + gdrudes)
         print("")
 
-        print("# flag for each atom type: [C]ore, [D]rude, [N]on-polarizable")
+        print("# identify each atom type: [C]ore, [D]rude, [N]on-polarizable")
         drudetypes = ""
         for att in self.atomtypes:
             drudetypes += " {0}".format(att['dflag'].upper())
@@ -658,31 +657,17 @@ class Data(object):
         print("comm_modify vel yes")
         print("")
 
-        print("# compute the temperatures of ATOMS, DC-DP pair centers of mass and DPs")
-        print("compute TATOM ATOMS temp")
-        print("compute TDRUDE all temp/drude")  
-        print("") 
-
-        print("# examples of termostats and barotats")
-        print("# NVT (Nose-Hoover)")
-        print("fix DTDIR all drude/transform/direct")
-        print("fix TSTAT ATOMS nvt temp 300.0 300.0 200")
-        print("fix TSTDR DRUDES nvt temp 1.0 1.0 50")
-        print("fix DTINV all drude/transform/inverse")
-        print("# NPT (Nose-Hoover)")
-        print("fix DTDIR all drude/transform/direct")
-        print("fix TSTAT ATOMS npt temp 300.0 300.0 200 iso 1.0 1.0 1000")
-        print("fix_modify TSTAT temp TATOM press thermo_press")
-        print("fix TSTDR DRUDES nvt temp 1.0 1.0 50")
-        print("fix DTINV all drude/transform/inverse")
+        print("variable TK equal 300.0")
+        print("variable TDRUDE equal 1.0")
+        print("variable PBAR equal 1.0")
+        print("")
+        
+        print("# temperature-grouped multiple Nosé-Hoover thermostats and barostat")
+        print("fix TSTAT all tgnpt/drude temp ${TK} ${TK} 100 ${TDRUDE} 20 iso ${PBAR} ${PBAR} 1000")
         print("")
 
-        print("# avoiding the flying ice cube artefact")
-        print("fix ICECUBE all momentum 1000 linear 1 1 1")
-        print("")
-
-        print("# output the temperatures of ATOMS, DC-DP pair centers of mass and DPs")
-        print("thermo_style custom step [...] c_TATOM c_TDRUDE[1] c_TDRUDE[2]")
+        print("# output the temperatures of molecular COM, COM of DC-DP, and DP")
+        print("thermo_style custom step [...] f_TSTAT[1] f_TSTAT[2] f_TSTAT[3]")
         print("")
 
         i = drudetypes.find("D")
@@ -693,16 +678,15 @@ class Data(object):
 
         print("# ATTENTION!")
         print("#  * read_data may need 'extra/special/per/atom' keyword, "
-              "LAMMPS will exit with a message.")
-        print("#  * If using fix shake the group-ID must not include "
-              "Drude particles. Use group ATOMS, for example.")
-        print("#  * Give all I<=J pair interactions, no mixing.")
-        print("#  * Pair style coul/long/cs from CORESHELL package is used "\
-              "for interactions")
-        print("#    of Drude particles. Alternatively pair lj/cut/thole/long "\
-              "could be used,")
-        print("#    avoiding hybrid/overlay and allowing mixing. See doc "\
-              "pages.")
+              "LAMMPS will exit with a message")
+        print("#  * if using fix shake the group-ID must not include "
+              "Drude particles; use group ATOMS")
+        print("#  * give all I<=J pair interactions, no mixing")
+        print("#  * pair style coul/long/cs from CORESHELL package is used "\
+              "for interactions of DP;")
+        print("#    alternatively pair lj/cut/thole/long could be used "\
+              "avoiding hybrid/overlay and")
+        print("#    allowing mixing; see doc pages.")
 
 # --------------------------------------
 
