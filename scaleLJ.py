@@ -2,12 +2,13 @@
 # scaleLJ.py - scale epsilon and sigma LJ parameters in pair.lmp LAMMPS file.
 # Agilio Padua <agilio.padua@ens-lyon.fr>
 # Kateryna Goloviznina <kateryna.goloviznina@ens-lyon.fr>
-# version 2021/02/16
+# version 2021/02/18
 
 import sys
 import math
 import argparse
 import os
+import numpy as np
 
 usage = """
 ==============================================================================
@@ -64,6 +65,14 @@ class _Const(object):
     @staticmethod
     def C1():
         return 0.106906
+
+    @staticmethod
+    def isfloat(value):
+        try:
+            float(value)
+            return True
+        except ValueError:
+            return False
     
 
 # monomer in fragment.ff        
@@ -122,7 +131,7 @@ class Forcefield(object):
                         if tok[0].endswith('+') or tok[0].endswith('-'):    
                             tok[0] = tok[0][:-1]
                         name = tok[0].lower()
-                        q = int(float(tok[1]))
+                        q = float(tok[1])
                         mu  = float (tok[2])
 
                         if next((x for x in self.monomers if x.name == name), None) is not None:
@@ -185,15 +194,32 @@ class Forcefield(object):
 
 # fragment in fragment.inp; fragment is based on monomer with index range in currect system added        
 class Fragment(Monomer):
-    def __init__(self, m, ind_range):
+    def __init__(self, m, ind_range, res):
         self.name = m.name
         self.q = m.q
         self.mu = m.mu
         self.ind_range = ind_range
+        self.pol_model = res[0]
+        self.scale_eps = res[1]
+        self.scale_sig = False
     
     def __str__(self):
-            return '%10s \t q = %2d \t mu = %6.4f D \t %s' % (self.name, self.q, self.mu, self.ind_range)
+            return '%10s  q = %5.2f  mu = %6.4f D    Pol = %5s ScaleEps = %5s ScaleSig = %5s Atoms=%s ' % (self.name, self.q, self.mu,self.pol_model, self.scale_eps, self.scale_sig, self.ind_range)
     
+    # checks if fragment is polarisable
+    @staticmethod
+    def PolExclude(m, p):
+        pol_model = False
+        scale_eps = True
+
+        if p is not None:
+            if m.name in p:
+                pol_model = True
+                if (m.q == 0 and m.mu == 0):
+                    scale_eps = False
+        
+        return (pol_model,scale_eps)
+
     # read atoms from .mol for a given fragment
     def GetAtomsFromMol(self, pol):
         zfilename = self.name+'.mol'
@@ -334,8 +360,15 @@ class FragmentPair(Dimer):
         alpha_fr1 = [sum(x.alpha for x in self.fr1.atoms)][0]
         alpha_fr2 = [sum(x.alpha for x in self.fr2.atoms)][0]
         k_pred = 1.0
-        k_pred += _Const.C0()*self.r*self.r*(self.fr1.q*self.fr1.q*alpha_fr2+self.fr2.q*self.fr2.q*alpha_fr1)/(alpha_fr1*alpha_fr2)
-        k_pred += _Const.C1()*(self.fr1.mu*self.fr1.mu*alpha_fr2+self.fr2.mu*self.fr2.mu*alpha_fr1)/(alpha_fr1*alpha_fr2)
+
+        if not self.fr1.pol_model:
+            k_pred += _Const.C0()*self.r*self.r*(self.fr2.q*self.fr2.q)/alpha_fr2
+            k_pred += _Const.C1()*(self.fr2.mu*self.fr2.mu)/alpha_fr2
+
+        if not self.fr2.pol_model:
+            k_pred += _Const.C0()*self.r*self.r*(self.fr1.q*self.fr1.q)/alpha_fr1
+            k_pred += _Const.C1()*(self.fr1.mu*self.fr1.mu)/alpha_fr1
+        
         k_pred = 1/k_pred
         self.k_pred = k_pred
 
@@ -387,7 +420,7 @@ class System(object):
         self.filename = filename
     
     # read fragments from fragment.inp    
-    def GetFragments(self, ff):
+    def GetFragments(self, ff, p):
         try:
             with open(self.filename, 'r') as f:
                 for line in f:
@@ -410,7 +443,9 @@ class System(object):
                     m = next((x for x in ff.monomers if x.name == m_name), None)
                     if m is None:
                         raise Exception('  error: fragment ' + m_name + ' not found in ' + ff.filename)
-                    self.fragments.append(Fragment(m,ind_range))
+                    
+                    self.fragments.append(Fragment(m,ind_range,Fragment.PolExclude(m,p)))
+                    #print(self.fragments[len(self.fragments)-1])
 
         except IOError:
             print('  error: fragment input file ' + filename + ' not found')
@@ -425,8 +460,9 @@ class System(object):
             i = j = 0
             for i in range(0,len(self.fragments)):
                 for j in range(i,len(self.fragments)):
-                    if self.fragments[i].q != self.fragments[j].q or max(abs(self.fragments[i].q),abs(self.fragments[j].q)) == 0:
+                    if (np.sign(self.fragments[i].q) != np.sign(self.fragments[j].q) or max(abs(self.fragments[i].q),abs(self.fragments[j].q)) == 0) and (self.fragments[i].scale_eps and self.fragments[j].scale_eps) and (not self.fragments[i].pol_model or not self.fragments[j].pol_model):
                         d = next((x for x in ff.dimers if (x.m1.name == self.fragments[i].name and x.m2.name == self.fragments[j].name) or (x.m1.name == self.fragments[j].name and x.m2.name == self.fragments[i].name)), None)
+ 
                         if d is not None:
                             self.fragmentpairs.append(FragmentPair(self.fragments[i],self.fragments[j],d.r,d.k_sapt))
                         else:
@@ -437,6 +473,31 @@ class System(object):
             print(e)  
             sys.exit(1)
 
+    def ParceScaleSigma(self, scsig):
+        #print(scsig)
+        
+        if len(scsig) > 0:
+            if _Const.isfloat(scsig[0]):
+                _Const.sigma_k = float(scsig[0])
+                scsig.pop(0)
+
+        if len(scsig) > 0:
+            for i in scsig:
+                fi = next((x for x in self.fragments if (x.name == i)), None)
+                if (fi is None):
+                    raise Exception('  error: fragment %s specified with -s option not found in fragment.inp ' % i)
+                elif fi.pol_model:
+                    raise Exception('  error: fragment %s specified with -s option is already polarisable: sigma should not be scaled' % i)
+                else:
+                    fi.scale_sig = True
+        else:
+            for f in self.fragments:
+                f.scale_sig = True 
+
+        #for f in self.fragments:        
+        #    print(f)
+
+    
     def __str__(self):
         res = self.filename
         res+='\nFRAGMENTS'
@@ -473,7 +534,7 @@ class System(object):
 # class with static functions to scale sigma and epsilon in pair-p.lmp and print output file             
 class ScaleLJ(object):
     @staticmethod
-    def Scale(pair_in_file, ff, mol, sapt, scsig):
+    def Scale(pair_in_file, ff, syst, sapt, scsig):
         try:
             res= []
             for line in open(pair_in_file, 'r'):
@@ -492,7 +553,7 @@ class ScaleLJ(object):
                 if len(tok) >= 7:
                     for n in range(6, len(tok)):
                         com += ' ' + tok[n]                   
-                for frp in mol.fragmentpairs:
+                for frp in syst.fragmentpairs:
                     if not sapt:
                         k = frp.k_pred
                     elif frp.k_sapt is not None:
@@ -503,9 +564,16 @@ class ScaleLJ(object):
                         eps *= k
                         com += ' ~'
                         break                    
-                if (scsig is not False):
-                    sig *= _Const.sigma_k
-                    com += ' *'   
+                
+                if (scsig is not None):
+                    fi = next((x for x in syst.fragments if (i in x.ind_range)), None)
+                    fj = next((x for x in syst.fragments if (j in x.ind_range)), None)
+
+                    if (fi is not None and fj is not None):
+                        if fi.scale_sig and fj.scale_sig:
+                            sig *= _Const.sigma_k
+                            com += ' *'
+  
                 res.append("pair_coeff {0:4d} {1:4d} {2:18s} {3:10.6f}   {4:10.6f} {5:s}".format(i, j, pair, eps, sig, com))
             return res
         
@@ -522,27 +590,42 @@ class ScaleLJ(object):
             for line in res:
                 f.write(line+'\n')
 
-def PrintReport(sys, sapt, scsig):
+def PrintReport(syst, sapt, scsig, polarisable):
     report = "Epsilon LJ parameters were scaled by "
     if sapt:
         report += "k_sapt"
     else:
         report += "k_pred"
-    report += " parameter. Changes are marked with '~'.\n"
+    report += " parameter"
+
+    if polarisable is not None:
+        tmp = ', '.join(polarisable)
+        report += ". Fragments %s were already polarisable " % tmp
+
+    report +=". Changes are marked with '~'.\n"
 
     report += "Sigma LJ parameters "
-    if scsig is False:
+    if scsig is None:
         report += "were not scaled.\n"
-    else:
-        report +="were scaled by %5.3f value for all the fragments. Changes are marked with '*'.\n" %  _Const.sigma_k
+    else: 
+        report +="were scaled by %5.3f value." %  _Const.sigma_k
+        
+        if all([x.scale_sig for x in syst.fragments]):
+            report += " All fragments were scaled."
+        else:
+            sig_list = [f.name for f in syst.fragments if f.scale_sig]
+            tmp = ', '.join(sig_list)
+            report += " Only %s fragments were scaled." % tmp
+        
+        report +=" Changes are marked with '*'.\n"
 
     report += '------------------------------------------\n'
 
-    report += 'Fragment1    Fragment2    k_sapt'
+    report += 'Fragment i   Fragment j   k_sapt'
     if not sapt:
         report += '    k_pred'
 
-    for frp in sys.fragmentpairs:
+    for frp in syst.fragmentpairs:
         report += '\n%-10s   %-10s' % (frp.fr1.name, frp.fr2.name)
         if sapt:
             report += '  %6.2f' % frp.k_sapt
@@ -559,30 +642,36 @@ def main():
     parser.add_argument('-f', '--ff_filename', type=str, default = 'fragment.ff', help = 'fragment force field (default: fragment.ff)')
     parser.add_argument('-a', '--alpha_filename', type=str, default = 'alpha.ff', help = 'polarisability values file (default: alpha.ff)')
     parser.add_argument('-i', '--input_filename', type=str, default = 'fragment.inp', help = 'fragment input file with atomic indices (default: fragment.inp)')
-    parser.add_argument('-ip', '--pair_in_filename', type=str, default = 'pair-p.lmp', help = 'pair style input file')
-    parser.add_argument('-op', '--pair_out_filename', type=str, default = 'pair-p-sc.lmp', help = 'pair style output file')
+    parser.add_argument('-ip', '--pair_in_filename', type=str, default = 'pair-p.lmp', help = 'pair style input file (default: pair-p.lmp)')
+    parser.add_argument('-op', '--pair_out_filename', type=str, default = 'pair-p-sc.lmp', help = 'pair style output file (default: pair-p-sc.lmp)')
     parser.add_argument('-q', '--sapt', action = 'store_true', help = 'use sapt calculated k values, default: use predicted k values')
-    parser.add_argument('-s', '--scsig', default=False, nargs='?', type = float, help = 'scale sigma only if -s specified; default: scale by 0.985')
+    parser.add_argument('-s', '--scsig', nargs='*', type = str,  help = 'scale sigma if specified; default value: 0.985; \n\
+    -s                       - scale all fragments\' sigma by 0.985 \n\
+    -s value                 - scale all fragments\' sigma by user-defined value \n\
+    -s name1 name2 ...       - scale the specified fragments\' sigma by 0.985 \n\
+    -s value name1 name2 ... - scale the specified fragments\' sigma by user-defined value')
+    parser.add_argument('-p', '--polarisable', nargs='+', type = str, help = 'already polarisable monomers')
 
     args = parser.parse_args()
 
     ff = Forcefield(args.ff_filename)
-    sys = System(args.input_filename)
-    sys.GetFragments(ff)
-    sys.GetFragmentPairs(ff)
+    syst = System(args.input_filename)
+    syst.GetFragments(ff,args.polarisable)
+
+    if args.scsig is not None:
+        syst.ParceScaleSigma(args.scsig)
+
+    syst.GetFragmentPairs(ff)
 
     if (not args.sapt):
         pol = Polarisation(args.alpha_filename)
-        sys.GetFragAtoms(pol)
-        sys.GetKPred()
-
-    if type(args.scsig) is float:
-        _Const.sigma_k = args.scsig
-
-    res = ScaleLJ.Scale(args.pair_in_filename,ff,sys,args.sapt,args.scsig)
+        syst.GetFragAtoms(pol)
+        syst.GetKPred()
+    
+    res = ScaleLJ.Scale(args.pair_in_filename,ff,syst,args.sapt,args.scsig)
     ScaleLJ.WriteResultToFile(args.pair_out_filename, res)
 
-    PrintReport(sys,args.sapt,args.scsig)
+    PrintReport(syst,args.sapt,args.scsig,args.polarisable)
     
 if __name__ == '__main__':
     main()
