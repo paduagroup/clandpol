@@ -9,6 +9,8 @@ _[Agilio Padua](http://perso.ens-lyon.fr/agilio.padua)_
 
 * `scaleLJ.py`: scales pair coefficients of Lennard-Jones interactions.
 
+* `coul_tt.py`: adds Tang Toennies charge-dipole damping for densely charged atoms.
+
 * `alpha.ff`: Drude induced dipole database.
 
 * `fragment.ff`: fragment database.
@@ -133,7 +135,7 @@ This script then adds new atom types, new bond types, new atoms and new bonds in
     #    alternatively pair lj/cut/thole/long could be used avoiding hybrid/overlay and
     #    allowing mixing; see doc pages.
 
-Pair i-j interactions between induced dipoles are described by `pair_coeff` in `pair-drude.lmp`. The script creates these files and concatenates `pair.lmp` and `pair-drude.lmp` files into `pair-p.lmp`, which is used for the next step.
+Pair i-j interactions between induced dipoles are described by `pair_coeff` in `pair-drude.lmp`. The `pair.lmp` and `pair-drude.lmp` files can ce concatenated into `pair-p.lmp`, which is used for the next step.
 
 
 #### 3. Scale LJ interactions between fragments
@@ -141,6 +143,11 @@ Pair i-j interactions between induced dipoles are described by `pair_coeff` in `
     python scaleLJ.py -f fragment.ff -a alpha.ff -i fragment.inp -ip pair-p.lmp -op pair-p-sc.lmp
 
 The script performs modification of Lennard-Jones interaction between atoms of the fragments. To prevent double counting of the induction effects, which are included implicitly in the empirical LJ potential, the epsilon value should be scaled. By default, the scaling factor is predicted by this script on the basis of simple properties. It can also be obtained through quantum chemistry calculation, via Symmetry-Adapted Perturbation Theory (SAPT), which can be invoked with the `-q` option. Scaling of the sigma value allows adjustment of the density of the system (if necessary), and can be enabled using the `-s` option which has a default value of 0.985.
+
+    python scaleLJ.py [...] -s                   - scale all fragments' sigma by 0.985
+    python scaleLJ.py [...] -s 0.9               - scale all fragments' sigma by a user-defined value
+    python scaleLJ.py [...] -s c2c1im [...]      - scale the specified fragments' sigma by 0.985
+    python scaleLJ.py [...] -s 0.9 c2c1im [...]  - scale the specified fragments' sigma by a user-defined value
 
 The script requires several input files with fragment specification, structure files of fragments in common formats (`.xyz`, `.zmat`, `.mol`, `.pdb`), and the `pair-p.lmp` file.
 
@@ -206,7 +213,7 @@ Here modification of the parameters of LJ interactions between N2000 and NO3 fra
 
 This is almos always needed between small, highly charged atoms (such as hydrogen) and induced dipoles to prevent the "polarization catastrophe".
 
-    python coul_tt.py -d data-p.lmp -p pair-p-sc.lmp -a 3
+    python coul_tt.py -d data-p.lmp -a 3
 
 The functional form of the damping function is
     
@@ -230,7 +237,7 @@ The script requires the `data-p.lmp` file to obtain the list of atoms and their 
     12    0.400  # NO DP
     13    0.400  # ON DP
 
-The atomic indices of small, highly charged atoms (typically, point charges without LJ sites) should be specified with the `-a` option. The short-range Coulomb interactions of those atoms with all Drude cores and Drude particles should be damped. The corresponding `pair_coeff` lines are appended to the `pair-p-sc.lmp` file.
+The atomic indices of small, highly charged atoms (typically, point charges without LJ sites) should be specified with the `-a` option. The short-range Coulomb interactions of those atoms with all Drude cores and Drude particles should be damped. The corresponding `pair_coeff` lines are written to the `pair-tt.lmp` file.
 
     pair_coeff    1    3 coul/tt 4.5 1.0
     pair_coeff    2    3 coul/tt 4.5 1.0
@@ -241,10 +248,11 @@ The atomic indices of small, highly charged atoms (typically, point charges with
 
 Here, the damped interactions are the ones of the HN atom (index 3) with Drude cores (indices 1, 2, 4, 7, 8) and Drude particles (indices 9-13).
 
-The script prints the command to be included by the user to the `in-p.lmp` file to declare the `coul/tt` pair style. 
+The script prints the command to be included by the user to the `in-p.lmp` file to declare the `coul/tt` pair style.
 
-    To inlcude in in-p.lmp:
-	    pair_style hybrid/overlay ... coul/tt 4 12.0
+    To inlcude to in-p.lmp:
+        pair_style hybrid/overlay ... coul/tt 4 12.0
+        include pair-tt.lmp
 
 #### 3. Modify the LJ interaction parameters of i-j pairs involved in hydrogen bonds
 
