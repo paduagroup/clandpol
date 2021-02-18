@@ -35,10 +35,10 @@ def WritePairFile(pfile, hatoms, cores, dp):
     for h in hatoms:
         for c in cores:
             if int(h) < c:
-                res.append('pair_coeff {0:4} {1:4} coul/tt 4.5 1.0'.format(int(h), c))
+                res.append('pair_coeff {0:4d} {1:4d} coul/tt 4.5 1.0'.format(int(h), c))
             else:
-                res.append('pair_coeff {0:4} {1:4} coul/tt 4.5 1.0'.format(c, int(h)))
-        res.append('pair_coeff {0:4} {1:3}* coul/tt 4.5 1.0'.format(int(h), dp))
+                res.append('pair_coeff {0:4d} {1:4d} coul/tt 4.5 1.0'.format(c, int(h)))
+        res.append('pair_coeff {0:4d} {1:3d}* coul/tt 4.5 1.0'.format(int(h), dp))
 
     with open(pfile, 'w') as f:
         for line in res:
