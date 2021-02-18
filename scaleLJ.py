@@ -83,7 +83,7 @@ class Monomer (object):
         self.mu = mu
 
     def __str__(self):
-        return '%10s \t q = %2d \t mu = %6.4f D' % (self.name, self.q, self.mu)
+        return '%10s  q = %2d   mu = %6.4f D' % (self.name, self.q, self.mu)
 
 # dimer in fragment.ff
 class Dimer (object):
@@ -102,9 +102,9 @@ class Dimer (object):
     def __str__(self):
         res = '%10s %10s' % (self.m1.name, self.m2.name)
         if self.r is not None:
-            res += '\t r = %6.4f' % self.r
+            res += '    r = %6.4f' % self.r
         if self.k_sapt is not None:
-            res += '\t k_sapt = %4.2f' % self.k_sapt
+            res += '    k_sapt = %4.2f' % self.k_sapt
         return res
 
 class Forcefield(object):
@@ -350,9 +350,9 @@ class FragmentPair(Dimer):
     def __str__(self):
         res = '%10s %10s' % (self.fr1.name, self.fr2.name)
         if self.r is not None:
-            res += '\t r = %6.4f' % self.r
+            res += '    r = %6.4f' % self.r
         if self.k_sapt is not None:
-            res += '\t k_sapt = %4.2f' % self.k_sapt
+            res += '    k_sapt = %4.2f' % self.k_sapt
         return res
 
     # predicts k factor for a given fragment pair based on total charge, alpha, dipole moment of fragment and interfragment distance 
@@ -379,7 +379,7 @@ class AtomType(object):
         self.alpha = alpha
     
     def __str__(self):
-        return  '%s \t %6.3f' %  (self.name, self.alpha)
+        return  '%s    %6.3f' %  (self.name, self.alpha)
 
 # polarisability values for all atom types; from alpha.ff
 class Polarisation(object):
@@ -445,7 +445,6 @@ class System(object):
                         raise Exception('  error: fragment ' + m_name + ' not found in ' + ff.filename)
                     
                     self.fragments.append(Fragment(m,ind_range,Fragment.PolExclude(m,p)))
-                    #print(self.fragments[len(self.fragments)-1])
 
         except IOError:
             print('  error: fragment input file ' + filename + ' not found')
@@ -474,7 +473,6 @@ class System(object):
             sys.exit(1)
 
     def ParceScaleSigma(self, scsig):
-        #print(scsig)
         
         if len(scsig) > 0:
             if _Const.isfloat(scsig[0]):
@@ -494,10 +492,7 @@ class System(object):
             for f in self.fragments:
                 f.scale_sig = True 
 
-        #for f in self.fragments:        
-        #    print(f)
-
-    
+   
     def __str__(self):
         res = self.filename
         res+='\nFRAGMENTS'
