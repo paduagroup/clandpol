@@ -1,10 +1,9 @@
 #!/usr/bin/env python
-# -*- coding: iso-8859-15 -*-
 # polarizer.py - add Drude oscillators to LAMMPS data file.
 # Agilio Padua <agilio.padua@ens-lyon.fr>
 # Alain Dequidt <alain.dequidt@uca.fr>
 # Kateryna Goloviznina <kateryna.goloviznina@ens-lyon.fr>
-# version 2021/02/16
+# version 2021/02/18
 
 import sys
 import argparse
@@ -663,7 +662,7 @@ class Data(object):
         print("variable PBAR equal 1.0")
         print("")
         
-        print("# temperature-grouped multiple Nosé-Hoover thermostats and barostat")
+        print("# temperature-grouped multiple Nose-Hoover thermostats and barostat")
         print("fix TSTAT all tgnpt/drude temp ${TK} ${TK} 100 ${TDRUDE} 20 iso ${PBAR} ${PBAR} 1000")
         print("")
 
