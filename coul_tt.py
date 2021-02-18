@@ -6,7 +6,7 @@ import os
 
 parser = argparse.ArgumentParser( description = 'Automatic coul/tt pair style generator')
 parser.add_argument('-d', '--dfile', dest='dfile', default='data-p.lmp', type=str, help='Data file with atomic indexes and labels of polarisable system [default: %(default)s]')
-parser.add_argument('-p', '--pfile', dest='pfile', default='pair-p.lmp', type=str, help='Pair file [default: %(default)s]')
+parser.add_argument('-p', '--pfile', dest='pfile', default='pair-p-sc.lmp', type=str, help='Pair file [default: %(default)s]')
 parser.add_argument('-a', '--hatoms', dest='hatoms', type=str, nargs='+', help='Atomic indexes of naked charge hydrogen atoms')
 
 args = parser.parse_args()
