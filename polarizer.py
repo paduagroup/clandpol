@@ -732,6 +732,9 @@ class Drude(object):
 
                 #skip H
                 if tok[0].startswith('H'):
+                    tmp_alpha_H = float(tok[4])
+                    if tmp_alpha_H != self.alpha_H:
+                        raise Exception('  error: atomic polarisability of hydrogen atoms should have unique value (%5.3f and %5.3f found)' % (self.alpha_H, tmp_alpha_H))
                     continue
 
                 drude = {}
@@ -742,11 +745,9 @@ class Drude(object):
                 alpha = float(tok[4]) # polarisability without H
                 drude['thole'] = float(tok[5])
 
-                # check if there are H arrached to the atom; if yes, merge their polarisability
+                # check if there are H attached to the atom; if yes, merge their polarisability
                 alpha += self.alpha_H*sys.countH(drude['type'])
                 drude['alpha'] = alpha
-                
-                #print(drude['type'],alpha,sys.countH(drude['type']),alpha + self.alpha_H*sys.countH(drude['type']))
 
                 if polar == 'q':
                     dq = (fpe0 * k * alpha)**0.5
