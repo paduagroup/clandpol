@@ -206,7 +206,7 @@ The scaling coefficient will depend only on the charge, dipole and molecular pol
 
  <img src="https://render.githubusercontent.com/render/math?math=k_{ij} = \bigg (1 %2B c_0 r_{ij}^2 \frac{ Q_i^2}{\alpha_i}  %2B   c_1 \frac{\mu_i^2}{\alpha_i} \bigg )^{-1}">
 
-the values should be specified in the input files for the script. The i-i Lennard-Jones coefficients for this fragment will not be modified.
+the values of which should be specified in the input files for the script. The i-i Lennard-Jones coefficients for this fragment will not be modified.
 
 ### Example 2. Protic ionic liquid (or other strongly H-bonded systems)
 
