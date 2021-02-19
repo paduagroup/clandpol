@@ -585,7 +585,7 @@ class ScaleLJ(object):
                 f.write(line+'\n')
 
 def PrintReport(syst, sapt, scsig, polarisable):
-    report = "Epsilon LJ parameters were scaled by "
+    report = "Epsilon LJ coefficients were scaled by "
     if sapt:
         report += "k_sapt"
     else:
@@ -596,7 +596,7 @@ def PrintReport(syst, sapt, scsig, polarisable):
         report += ". Fragment(s) {0} was/were already polarisable ".format(tmp)
 
     report +=". Changes are marked with '~'.\n"
-    report += "Sigma LJ parameters "
+    report += "Sigma LJ coefficients "
     if scsig is None:
         report += "were not scaled.\n"
     else: 
