@@ -144,9 +144,7 @@ Pair i-j interactions between induced dipoles are described by `pair_coeff` in `
 
 The script performs modification of Lennard-Jones interaction between atoms of the fragments. To prevent double counting of the induction effects, which are included implicitly in the empirical LJ potential, the epsilon value should be scaled. By default, the scaling factor is predicted by this script on the basis of simple properties, 
 
-<img src="https://render.githubusercontent.com/render/math?math=k_{ij} = \bigg (1 +  c_0 r_{ij}^2 \frac{ Q_i^2\alpha_j
-    + Q_j^2\alpha_i}{\alpha_i\alpha_j}  +   c_1 \frac{\mu_i^2 \alpha_j +
-    \mu_j^2 \alpha_i}{\alpha_i \alpha_j} \bigg )^{-1}">
+<img src="https://render.githubusercontent.com/render/math?math=k_{ij} = \bigg (1 %2B  c_0 r_{ij}^2 \frac{ Q_i^2\alpha_j %2B Q_j^2\alpha_i}{\alpha_i\alpha_j}  %2B   c_1 \frac{\mu_i^2 \alpha_j %2B \mu_j^2 \alpha_i}{\alpha_i \alpha_j} \bigg )^{-1}">
 
 It can also be obtained through quantum chemistry calculation, via Symmetry-Adapted Perturbation Theory (SAPT), which can be invoked with the `-q` option. Scaling of the sigma value allows adjustment of the density of the system (if necessary), and can be enabled using the `-s` option which has a default value of 0.985.
 
@@ -206,9 +204,9 @@ The CL&Pol force field can be mixed with another polarisable force field, for ex
 
 The scaling coefficient will depend only on the charge, dipole and molecular polarisability of this fragment
 
- <img src="https://render.githubusercontent.com/render/math?math=k_{ij} = \bigg (1 + c_0 r_{ij}^2 \frac{ Q_i^2}{\alpha_i}  +   c_1 \frac{\mu_i^2}{\alpha_i} \bigg )^{-1}">
+ <img src="https://render.githubusercontent.com/render/math?math=k_{ij} = \bigg (1 %2B c_0 r_{ij}^2 \frac{ Q_i^2}{\alpha_i}  %2B   c_1 \frac{\mu_i^2}{\alpha_i} \bigg )^{-1}">
 
-that should be specified in the input files for the script.
+the values should be specified in the input files for the script. The i-i Lennard-Jones coefficients for this fragment will not be modified.
 
 ### Example 2. Protic ionic liquid (or other strongly H-bonded systems)
 
@@ -231,7 +229,7 @@ This is almos always needed between small, highly charged atoms (such as hydroge
     python coul_tt.py -d data-p.lmp -a 3
 
 The functional form of the damping function is
-    
+
 <img src="https://render.githubusercontent.com/render/math?math=f(r) = 1 - c \cdot e^{-b r} \sum_{k=0}^4 \frac{(b r)^k}{k!}">
 
 resulting from an adaptation to the Coulomb interaction of the damping function originally proposed by Tang Toennies for van der Waals interactions. The `b` value is set to 4.5 and the `c` value to 1.0. This function is implemented as `coul/tt` pair style in LAMMPS (version 29Oct20 or newer), the detailed description is given [here](https://lammps.sandia.gov/doc/pair_coul_tt.html). 
