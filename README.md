@@ -142,7 +142,13 @@ Pair i-j interactions between induced dipoles are described by `pair_coeff` in `
 
     python scaleLJ.py -f fragment.ff -a alpha.ff -i fragment.inp -ip pair-p.lmp -op pair-p-sc.lmp
 
-The script performs modification of Lennard-Jones interaction between atoms of the fragments. To prevent double counting of the induction effects, which are included implicitly in the empirical LJ potential, the epsilon value should be scaled. By default, the scaling factor is predicted by this script on the basis of simple properties. It can also be obtained through quantum chemistry calculation, via Symmetry-Adapted Perturbation Theory (SAPT), which can be invoked with the `-q` option. Scaling of the sigma value allows adjustment of the density of the system (if necessary), and can be enabled using the `-s` option which has a default value of 0.985.
+The script performs modification of Lennard-Jones interaction between atoms of the fragments. To prevent double counting of the induction effects, which are included implicitly in the empirical LJ potential, the epsilon value should be scaled. By default, the scaling factor is predicted by this script on the basis of simple properties, 
+
+<img src="https://render.githubusercontent.com/render/math?math=k_{ij} = \bigg (1 +  c_0 r_{ij}^2 \frac{ Q_i^2\alpha_j
+    + Q_j^2\alpha_i}{\alpha_i\alpha_j}  +   c_1 \frac{\mu_i^2 \alpha_j +
+    \mu_j^2 \alpha_i}{\alpha_i \alpha_j} \bigg )^{-1}">
+
+It can also be obtained through quantum chemistry calculation, via Symmetry-Adapted Perturbation Theory (SAPT), which can be invoked with the `-q` option. Scaling of the sigma value allows adjustment of the density of the system (if necessary), and can be enabled using the `-s` option which has a default value of 0.985.
 
     python scaleLJ.py [...] -s                   - scale all fragments' sigma by 0.985
     python scaleLJ.py [...] -s 0.9               - scale all fragments' sigma by a user-defined value
@@ -194,6 +200,15 @@ Scaled epsilon (and sigma) values for LJ interaction are printed into a `pair-p-
     c4h10        dca            0.69      0.72
     ------------------------------------------
 
+The CL&Pol force field can be mixed with another polarisable force field, for example SWM4-NDP model of water. In this case, the scaling of epsilon should be performed only partially that can be envoked with `-p` option
+
+    python scaleLJ.py [...] -p swm4-ndp
+
+The scaling coefficient will depend only on the charge, dipole and molecular polarisability of this fragment
+
+ <img src="https://render.githubusercontent.com/render/math?math=k_{ij} = \bigg (1 + c_0 r_{ij}^2 \frac{ Q_i^2}{\alpha_i}  +   c_1 \frac{\mu_i^2}{\alpha_i} \bigg )^{-1}">
+
+that should be specified in the input files for the script.
 
 ### Example 2. Protic ionic liquid (or other strongly H-bonded systems)
 
@@ -269,7 +284,6 @@ The `pair_coeff` parameters of the interaction between N1 and ON atoms in the `p
 should be replaced by
         
     pair_coeff    1    8 lj/cut/coul/long     0.037789     3.750000  # N1 ON 
-
 
 ## References
 
