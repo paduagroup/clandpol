@@ -11,7 +11,7 @@ _[Agilio Padua](http://perso.ens-lyon.fr/agilio.padua)_
 
 * `coul_tt.py`: adds Tang Toennies charge-dipole damping for densely charged atoms.
 
-* `alpha.ff`: Drude induced dipole database.
+* `alpha.ff`: Drude parameter database.
 
 * `fragment.ff`: fragment database.
 
@@ -21,7 +21,7 @@ _[Agilio Padua](http://perso.ens-lyon.fr/agilio.padua)_
 
 * `example_pil/`: examples of ethylammonium nitrate (EAN) molecule files and force field database (protic ionic liquid).
 
-* `example_des/`: examples of choline chloride - ethylene glycol (ChCl-EG) molecule files and force field database (deep eutectic solvent).
+* `example_des/`: examples of choline chloride:ethylene glycol (ChCl:EG) molecule files and force field database (deep eutectic solvent).
 
 ## Requirements
 
@@ -39,33 +39,31 @@ Download the files or clone the repository:
 
 ## Tutorial
 
-These are instructions on how to build an initial configuration for a
-polarisable system composed of molecules, ions or materials.
+These are instructions on how to build an initial configuration for a polarisable system composed of molecules, ions or materials.
 
 To perform the simulation of a polarisable system, the `USER-DRUDE` package should be enabled during LAMMPS compilation.
 
-Two systems, 1-butyl-3-methylimidazolium dicyanamide ([C4C1im][DCA]) and
-ethylammonium nitrate (EAN), are considered as examples of aprotic and protic ionic liquids, respectively.
+Two systems, 1-butyl-3-methylimidazolium dicyanamide ([C4C1im][DCA]) and ethylammonium nitrate (EAN), are considered as examples of aprotic and protic ionic liquids, respectively.
 
 ### Example 1. Aprotic ionic liquid
 
 The input files for a system consisting of one [C4C1im]+ cation and one [DCA]- anion can be found in the `example_il/` folder.
 
 
-#### 1. Create input files for a non-polarizable system 
+#### 1.1 Create input files for a non-polarizable system 
 
-Use `fftool` to create `data.lmp`, `in.lmp` and `pair.lmp` files. A separate `pair.lmp` file containing all i-j pair coefficients is required for future procedures and can be created using the `-a` option of `fftool`. The detailed instructions on how to use `fftool` can be found [here](https://github.com/agiliopadua/fftool).
+Use `fftool` to create `data.lmp`, `in.lmp` and `pair.lmp` files. A separate `pair.lmp` file containing all i-j pair coefficients will be required later and can be created using the `-a` option of `fftool`. Detailed instructions on how to use `fftool` can be found [here](https://github.com/agiliopadua/fftool).
 
     fftool 1 c4c1im.zmat 1 dca.zmat -b 20
     packmol < pack.inp
     fftool 1 c4c1im.zmat 1 dca.zmat -b 20 -a -l
 
 
-#### 2. Add Drude induced dipoles to LAMMPS data file
+#### 1.2 Add Drude induced dipoles to LAMMPS data file
 
-    python polarizer.py c4c1im.zmat dca.zmat -f alpha.ff -q -id data.lmp -od data-p.lmp
+    polarizer.py c4c1im.zmat dca.zmat -f alpha.ff -q -id data.lmp -od data-p.lmp
 
-The script requires a file containing the specification of Drude induced dipoles according to the following format, and specified with the `-f` option:
+The `polarizer` script requires an input file (`-f` option) with parameter for Drude induced dipoles in the format:
 
     # alpha.ff
     type  dm/u  dq/e  k/(kJ/molA2)  alpha/A3  thole
@@ -73,25 +71,29 @@ The script requires a file containing the specification of Drude induced dipoles
     NA    0.4   -1.0     4184.0     1.208     2.6
     ...
 
-where
-    * `dm` is the mass to place on the Drude particle (taken from its core),
-    * `dq` is the charge to place on the Drude particle (taken from its core),
-    * `k` is the harmonic force constant of the bond between core and Drude,
-    * `alpha` is the polarizability (hydrogen aroms are not merged),
-    * `thole` is a parameter of the Thole damping function.
+* `dm` is the mass to place on the Drude particle (taken from its core),
+* `dq` is the charge to place on the Drude particle (taken from its core),
+* `k` is the harmonic force constant of the bond between core and Drude,
+* `alpha` is the polarizability (hydrogen atoms are not merged),
+* `thole` is a parameter for the Thole damping function.
 
-The harmonic constant and the charge on the Drude particle are related though the relation <img src="https://render.githubusercontent.com/render/math?math=\alpha = q_D^2/k_D">. Use the `-q` option to read the force constant from the input file and to calculate Drude charge from the polarizabilities or the `-k` option to read the Drude charge from `alpha.ff` and to recalculate the force constant according to the relation above.
+The force constant and the charge on the Drude particle are related though <img src="https://render.githubusercontent.com/render/math?math=\alpha = q_D^2/k_D">. Use the `-q` option to read the force constant from `alpha.ff` and to calculate Drude charges from the polarizabilities, or else the `-k` option to read the Drude charge from `alpha.ff` and to calculate force constants from polarizabilities. The former is usually preferred.
 
-A Drude particle is created for each atom in the LAMMPS data file that corresponds to an atom type given in the Drude file. Since LAMMPS uses numbers for atom types in the data file, a comment after each line in the Masses section needs to be introduced in the original data file to allow identification of the atom types within the force field database:
+A Drude particle is created for each atom found in the LAMMPS data `data.lmp` file that corresponds to an atom type given in the Drude file. Since LAMMPS uses numbers for atom types in the data file, comments after each line in the Masses section of the original LAMMPS data file need to be introduced, to allow identification of the atom types:
 
     Masses
     1   14.007  # NA
     2   12.011  # CR
     ...
 
-This script then adds new atom types, new bond types, new atoms and new bonds into a new `data-p.lmp` file. It also generates commands to be included in the `LAMMPS` input script and outputs them to the terminal. They are related to the topology and the force field, namely the `fix drude` and `pair_style` commands, and include examples of thermostats:
+The `polarizer` script then adds new atom types, new bond types, new atoms and new bonds to a new `data-p.lmp` file.
 
-    # Commands to include in the LAMMPS input script
+It also generates pair involving Drude particles to a file `pair-drude.lmp`, which is to be included in the LAMMPS input script.
+ The `pair.lmp` and `pair-drude.lmp` files can be concatenated into `pair-p.lmp`, which is used for the next step.
+
+The `polarizer` script also generates example commands to be included in the LAMMPS input script and writes those to `in-p.lmp`. These commands are related to the topology and the force field, namely `fix drude` and `pair_style` commands, and include examples of thermostats:
+
+    # Commands to include in the LAMMPS input stack
 
     # adapt the pair_style command as needed
     pair_style hybrid/overlay ... coul/long/cs 12.0 thole 2.600 12.0
@@ -118,7 +120,7 @@ This script then adds new atom types, new bond types, new atoms and new bonds in
     variable TDRUDE equal 1.0
     variable PBAR equal 1.0
 
-    # temperature-grouped multiple Nosé-Hoover thermostats and barostat
+    # temperature-grouped multiple Nose-Hoover thermostats and barostat
     fix TSTAT all tgnpt/drude temp ${TK} ${TK} 100 ${TDRUDE} 20 iso ${PBAR} ${PBAR} 1000
 
     # output the temperatures of molecular COM, COM of DC-DP, and DP
@@ -135,27 +137,17 @@ This script then adds new atom types, new bond types, new atoms and new bonds in
     #    alternatively pair lj/cut/thole/long could be used avoiding hybrid/overlay and
     #    allowing mixing; see doc pages.
 
-Pair i-j interactions between induced dipoles are described by `pair_coeff` in `pair-drude.lmp`. The `pair.lmp` and `pair-drude.lmp` files can be concatenated into `pair-p.lmp`, which is used for the next step.
 
 
-#### 3. Scale LJ interactions between fragments
+#### 1.3 Scale LJ interactions between fragments
 
-    python scaleLJ.py -f fragment.ff -a alpha.ff -i fragment.inp -ip pair-p.lmp -op pair-p-sc.lmp
+    scaleLJ.py -f fragment.ff -a alpha.ff -i fragment.inp -ip pair.lmp -op pair-sc.lmp
 
-The script performs modification of Lennard-Jones interaction between atoms of the fragments. To prevent double counting of the induction effects, which are included implicitly in the empirical LJ potential, the epsilon value should be scaled. By default, the scaling factor is predicted by this script on the basis of simple properties, 
+The `scaleLJ` script scales LJ epsilon parameters between fragments to prevent double counting of induction effects. This is needed if starting from a non-polarizable force field that implicitly includes polarization in the LJ terms. By default, the scaling factor is computed  by this script from the charges and dipole moments of the fragments
 
 <img src="https://render.githubusercontent.com/render/math?math=k_{ij} = \bigg (1 %2B  c_0 r_{ij}^2 \frac{ Q_i^2\alpha_j %2B Q_j^2\alpha_i}{\alpha_i\alpha_j}  %2B   c_1 \frac{\mu_i^2 \alpha_j %2B \mu_j^2 \alpha_i}{\alpha_i \alpha_j} \bigg )^{-1}">
 
-It can also be obtained through quantum chemistry calculation, via Symmetry-Adapted Perturbation Theory (SAPT), which can be invoked with the `-q` option. Scaling of the sigma value allows adjustment of the density of the system (if necessary), and can be enabled using the `-s` option which has a default value of 0.985.
-
-    python scaleLJ.py [...] -s                   - scale all fragments' sigma by 0.985
-    python scaleLJ.py [...] -s 0.9               - scale all fragments' sigma by a user-defined value
-    python scaleLJ.py [...] -s c2c1im c4h10      - scale the specified fragments' sigma by 0.985
-    python scaleLJ.py [...] -s 0.9 c2c1im c4h10  - scale the specified fragments' sigma by a user-defined value
-
-The script requires several input files with fragment specification, structure files of fragments in common formats (`.xyz`, `.zmat`, `.mol`, `.pdb`), and the `pair-p.lmp` file.
-
-The file containing specification of monomers and dimers has the following format:
+Charges and dipole moments for new fragments can be calculated using quantum chemistry (we used the level MP2/cc-pVTZ). Details are given in the [CL&Pol] paper. Fragment charges and dipole moments are provided in the file `fragment.ff`:
 
     # fragment.ff
     MONOMERS
@@ -167,16 +159,24 @@ The file containing specification of monomers and dimers has the following forma
     c2c1im       dca      2.935      0.61
     ...
 
-where
-    * `q` is the charge of the monomer,
-    * `mu` is the dipole moment of the monomer,
-    * `m1` and `m2` are the monomers forming a dimer,
-    * `r_COM` is the distance between the centers of mass of the monomers,
-    * `k_sapt` is the scaling factor for the epsilon of LJ potential, obtained by SAPT quantum calculation (optional).
+* `q` is the charge of the monomer,
+* `mu` is the dipole moment of the monomer,
+* `m1` and `m2` are the monomers forming a dimer,
+* `r_COM` is the distance between the centers of mass of the monomers,
+* `k_sapt` is the scaling factor for the epsilon of LJ potential, obtained by SAPT quantum calculation (optional).
 
-If equilibrium distances are missing for certain fragment dimers, these can be obtained from a geometry optimization (we used dispersion-corrected DFT, B97+D3/cc-pVTZ). Charges and dipole moments for new fragments can be calculated using quantum chemistry (we used the level MP2/cc-pVTZ). Details are given in the [CL&Pol] paper.
+If equilibrium distances are missing for certain fragment dimers, these can be obtained from a geometry optimization (we used dispersion-corrected DFT, B97+D3/cc-pVTZ). 
 
-Format of file containing fragment list with atomic type indices:
+The value of the scaling factor can also be obtained through direct quantum chemistry calculation, via Symmetry-Adapted Perturbation Theory (SAPT). It those are available in the `fragment.ff` file, they can be chosen with the `-q` option. 
+
+In some cases it may be useful to scaling of the sigma LJ values to adjust density, and this can be enabled using the `-s` option (which applies a default value of 0.985).
+
+    scaleLJ.py [...] -s                   - scale all fragments' sigma by 0.985
+    scaleLJ.py [...] -s 0.9               - scale all fragments' sigma by a user-defined value
+    scaleLJ.py [...] -s c2c1im c4h10      - scale the specified fragments' sigma by 0.985
+    scaleLJ.py [...] -s 0.9 c2c1im c4h10  - scale the specified fragments' sigma by a user-defined value
+
+Finally, `fragment.inp` is a small input file identifies the atomic types corresponding to each fragment:
 
     # fragment.inp
     # c4c1im dca
@@ -184,9 +184,11 @@ Format of file containing fragment list with atomic type indices:
     C4H10   9:12
     dca    13:15
 
-where atomic indices or/and a range of indices correspond to atomic types associating with this fragment in the `data.lmp` file. In this example, NA, CR, CW, C1, HCR, C1A, HCW, H1 belong to the c2c1im fragment; C2, CS, HC, CT are from the C4H10 fragment and N3A, CZA, NZA are from the dca fragment. Thus, the script requires `c2c1im.zmat`, `C4H10.zmat` and `dca.zmat` structure files.
+where atomic indices or/and a range of indices correspond to atomic types associating with this fragment in the `data.lmp`. In this example, NA, CR, CW, C1, HCR, C1A, HCW, H1 belong to the c2c1im fragment; C2, CS, HC, CT are from the C4H10 fragment and N3A, CZA, NZA are from the dca fragment. Thus, the script requires `c2c1im.zmat`, `C4H10.zmat` and `dca.zmat` structure files for the fragments.
 
-Scaled epsilon (and sigma) values for LJ interaction are printed into a `pair-p-sc.lmp` file that directly can be used by LAMMPS. The scaling coefficients are outputted to the terminal. If they are obtained by the prediction scheme, SAPT calculated values (if available) are given only for the comparison.
+The `scaleLJ` script relies on several input files with fragment specification, structure files of fragments in common formats (`.xyz`, `.zmat`, `.mol`, `.pdb`), and the `pair.lmp` file with the original pair parameters of the non-polarizable system.
+
+Scaled epsilon (and sigma) values for LJ interactions are written to a `pair-sc.lmp` file that can be included in the LAMMPS input script. The parameters that were scaled are identified by a `~` character. The scaling coefficients used are also printed to the screen. If they are obtained by the prediction scheme, SAPT calculated values (if available) are shown only for the comparison.
 
     Epsilon LJ parameters were scaled by k_pred parameter. Changes are marked with '~'.
     Sigma LJ parameters were not scaled.
@@ -198,43 +200,44 @@ Scaled epsilon (and sigma) values for LJ interaction are printed into a `pair-p-
     c4h10        dca            0.69      0.72
     ------------------------------------------
 
-The CL&Pol force field can be mixed with another polarisable force field, for example SWM4-NDP model of water. In this case, the scaling of epsilon should be performed only partially that can be envoked with `-p` option
+The CL&Pol force field can be mixed with other polarisable force fields, for example the SWM4-NDP model of water. In this case, the scaling of LJ epsilon should be performed only partially, and this can be controlled with `-p` option that identifies already polarisable fragments that don't need scaling:
 
     python scaleLJ.py [...] -p swm4-ndp
 
-The scaling coefficient will depend only on the charge, dipole and molecular polarisability of this fragment
+The scaling coefficient will depend on the charge, dipole and molecular polarisability of this fragment only, the values of which should be specified in the input files for the `scaleLJ` script.
 
- <img src="https://render.githubusercontent.com/render/math?math=k_{ij} = \bigg (1 %2B c_0 r_{ij}^2 \frac{ Q_i^2}{\alpha_i}  %2B   c_1 \frac{\mu_i^2}{\alpha_i} \bigg )^{-1}">
+<img src="https://render.githubusercontent.com/render/math?math=k_{ij} = \bigg (1 %2B c_0 r_{ij}^2 \frac{ Q_i^2}{\alpha_i}  %2B   c_1 \frac{\mu_i^2}{\alpha_i} \bigg )^{-1}">
 
-the values of which should be specified in the input files for the script. The i-i Lennard-Jones coefficients for this fragment will not be modified.
+The scaling will only affect interactions with other fragments, the i-i Lennard-Jones coefficients involving this fragment will not be modified. 
+
 
 ### Example 2. Protic ionic liquid (or other strongly H-bonded systems)
 
 The input files of a system consisting of one ethylammonium nitrate ion pair can be found in the `example_pil/` folder.
 
-#### 1. Steps 1 to 3 are identical to Example 1
+#### 2.1 Steps 1 to 3 are identical to Example 1
 
     fftool 1 N2000.zmat 1 no3.zmat -b 20
-    packmol <pack.inp
+    packmol < pack.inp
     fftool 1 N2000.zmat 1 no3.zmat -b 20 -a -l
-    python polarizer.py N2000.zmat no3.zmat -f alpha.ff -q
-    python scaleLJ.py -q 
+    polarizer.py N2000.zmat no3.zmat -f alpha.ff -q
+    scaleLJ.py -q 
 
-Here modification of the parameters of LJ interactions between N2000 and NO3 fragments is performed using the scaling factor obtained through SAPT calculation (invoked with the `-q` option).
+Here modification of the parameters of LJ interactions between N2000 and NO3 fragments is performed using the scaling factor obtained through SAPT calculation (`-q` option).
 
-#### 2. Add short range damping of charge-dipole Coulomb interactions
+#### 2.2 Add short range damping to charge-induced dipole interactions
 
-This is almos always needed between small, highly charged atoms (such as hydrogen) and induced dipoles to prevent the "polarization catastrophe".
+Short-range damping is almost always needed between small, highly charged atoms (such as H) and induced dipoles to prevent the "polarization catastrophe".
 
-    python coul_tt.py -d data-p.lmp -a 3
+    coul_tt.py -d data-p.lmp -a 3
 
-The functional form of the damping function is
+The functional form of the damping function is an adaptation of the Tang-Toennies damping function  for dispersion interactions:
 
 <img src="https://render.githubusercontent.com/render/math?math=f(r) = 1 - c \cdot e^{-b r} \sum_{k=0}^4 \frac{(b r)^k}{k!}">
 
-resulting from an adaptation to the Coulomb interaction of the damping function originally proposed by Tang Toennies for van der Waals interactions. The `b` value is set to 4.5 and the `c` value to 1.0. This function is implemented as `coul/tt` pair style in LAMMPS (version 29Oct20 or newer), the detailed description is given [here](https://lammps.sandia.gov/doc/pair_coul_tt.html). 
+We set `b = 4.5` and `c = 1.0`. This damping function is implemented in the `coul/tt` pair style in LAMMPS (version 29Oct20 or newer) with details given [here](https://lammps.sandia.gov/doc/pair_coul_tt.html). 
 
-The script requires the `data-p.lmp` file to obtain the list of atoms and their type (polarisable or non-polarisable). 
+The `coul_tt` script requires the `data-p.lmp` file to obtain the list of atoms and their type (polarisable or non-polarisable). 
 
      1   13.607  # N1 DC
      2   11.611  # C1N DC
@@ -250,7 +253,7 @@ The script requires the `data-p.lmp` file to obtain the list of atoms and their 
     12    0.400  # NO DP
     13    0.400  # ON DP
 
-The atomic indices of small, highly charged atoms (typically, point charges without LJ sites) should be specified with the `-a` option. The short-range Coulomb interactions of those atoms with all Drude cores and Drude particles should be damped. The corresponding `pair_coeff` lines are written to the `pair-tt.lmp` file.
+The atomic indices of small, highly charged atoms (typically, point charges without LJ sites) should be specified with the `-a` option. The short-range Coulomb interactions of those atoms with all Drude cores and Drude particles will be damped. The corresponding `pair_coeff` lines are written to a `pair-tt.lmp` file.
 
     pair_coeff    1    3 coul/tt 4.5 1.0
     pair_coeff    2    3 coul/tt 4.5 1.0
@@ -259,29 +262,30 @@ The atomic indices of small, highly charged atoms (typically, point charges with
     pair_coeff    3    8 coul/tt 4.5 1.0
     pair_coeff    3   9* coul/tt 4.5 1.0
 
-Here, the damped interactions are the ones of the HN atom (index 3) with Drude cores (indices 1, 2, 4, 7, 8) and Drude particles (indices 9-13).
+In this example, the damped interactions are the ones of the HN atom (index 3) with Drude cores (indices 1, 2, 4, 7, 8) and Drude particles (indices 9-13).
 
-The script prints the commands to be included by the user to the `in-p.lmp` file to declare the `coul/tt` pair style.
+The `coul_tt` script prints the commands to be included by the user to the `in-p.lmp` file to declare the `coul/tt` pair style.
 
     To inlcude to in-p.lmp:
         pair_style hybrid/overlay ... coul/tt 4 12.0
         include pair-tt.lmp
 
-#### 3. Modify the LJ interaction parameters of i-j pairs involved in hydrogen bonds
+#### 2.3 Modify LJ parameters of i-j pairs involved in hydrogen bonds
 
-Hydrogen bonds (D-H...A) involving hydrogen atoms represented by 'naked' charges without Lennard-Jones sites could lead to "freezing" of a system when modelled using polarisable force field. To avoid this effect, the repulsive potential between D and A sites should be adjusted with a typical value of the sigma parameter of 3.7 to 3.8 Å.
+Hydrogen bonds (D-H...A) involving hydrogen atoms represented by 'naked' charges without Lennard-Jones sites can lead to "freezing" of a system when modelled using a polarisable force field. To avoid this, the repulsive potential between D and A sites can be adjusted, with a typical value of the sigma parameter of 3.7 to 3.8 Å.
 
-In EAN, the hydrogen bond is formed between HN hydrogens atoms of the cation embedded into neighbouring N1 nitrogen atoms and the ON oxygen atoms of the anion. The sigma LJ parameter of the N1-ON interaction should be increased from 3.10 Å to 3.75 Å.
+In EAN, the hydrogen bond is formed between HN atoms of the cation embedded into neighbouring N1 atoms and the ON atoms of the anion. The LJ sigma parameter of the N1-ON interaction should be increased from 3.10 Å to 3.75 Å.
 
 <img src="example_pil/ean.png" alt="ean" width="300"/>
 
-The `pair_coeff` parameters of the interaction between N1 and ON atoms in the `pair-p-sc.lmp` file
+The `pair_coeff` parameters of the interaction between N1 and ON atoms in the `pair-sc.lmp` file
 
     pair_coeff    1    8 lj/cut/coul/long     0.037789     3.101612  # N1 ON 
         
 should be replaced by
         
     pair_coeff    1    8 lj/cut/coul/long     0.037789     3.750000  # N1 ON 
+
 
 ## References
 
