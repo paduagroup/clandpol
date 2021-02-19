@@ -251,7 +251,7 @@ The `coul_tt` script requires the `data-p.lmp` file to obtain the list of atoms 
     12    0.400  # NO DP
     13    0.400  # ON DP
 
-The atomic indices of small, highly charged atoms (typically, point charges without LJ sites) should be specified with the `-a` option. The short-range Coulomb interactions of those atoms with all Drude cores and Drude particles will be damped. The corresponding `pair_coeff` lines are written to a `pair-tt.lmp` file.
+The atomic indices of small, highly charged atoms (typically, point charges without LJ sites) should be specified with the `-a` option and sepatared with spaces. The short-range Coulomb interactions of those atoms with all Drude cores and Drude particles will be damped. The corresponding `pair_coeff` lines are written to a `pair-tt.lmp` file.
 
     pair_coeff    1    3 coul/tt 4.5 1.0
     pair_coeff    2    3 coul/tt 4.5 1.0
