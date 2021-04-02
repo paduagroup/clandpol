@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import argparse
 
 def ReadData(dfile):
@@ -45,7 +47,7 @@ def WritePairFile(pfile, hatoms, cores, dp):
             f.write(line+'\n')
 
 def WriteInputFile(pfile):
-    print('To inlcude to in-p.lmp:')
+    print('To inlcude in in-p.lmp:')
     print('    pair_style hybrid/overlay [...] coul/tt 4 12.0')
     print('    include {0}'.format(pfile))
 

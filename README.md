@@ -62,7 +62,7 @@ Use `fftool` to create `data.lmp`, `in.lmp` and `pair.lmp` files. A separate `pa
 
 #### 1.2 Add Drude induced dipoles to LAMMPS data file
 
-    polarizer.py c4c1im.zmat dca.zmat -f alpha.ff -q -id data.lmp -od data-p.lmp
+    polarizer -f alpha.ff data.lmp data-p.lmp
 
 The `polarizer` script requires an input file (`-f` option) with parameters for Drude induced dipoles in the format:
 
@@ -139,7 +139,7 @@ The `polarizer` script provides example commands to be included in the LAMMPS in
 
 #### 1.3 Scale LJ interactions between fragments
 
-    scaleLJ.py -f fragment.ff -a alpha.ff -i fragment.inp -ip pair.lmp -op pair-sc.lmp
+    scaleLJ -f fragment.ff -a alpha.ff -i fragment.inp -ip pair.lmp -op pair-sc.lmp
 
 The `scaleLJ` script scales LJ epsilon coefficients between fragments to prevent double counting of induction effects. This is needed if starting from a non-polarizable force field that implicitly includes polarization in the LJ terms. By default, the scaling factor is computed  by this script from the charges and dipole moments of the fragments
 
@@ -218,8 +218,8 @@ The input files of a system consisting of one ethylammonium nitrate ion pair can
     fftool 1 N2000.zmat 1 no3.zmat -b 20
     packmol < pack.inp
     fftool 1 N2000.zmat 1 no3.zmat -b 20 -a -l
-    polarizer.py N2000.zmat no3.zmat -f alpha.ff -q
-    scaleLJ.py -q 
+    polarizer -f alpha.ff data.lmp data-p.lmp
+    scaleLJ -q 
 
 Here modification of the coefficients of LJ interactions between N2000 and NO3 fragments is performed using the scaling factor obtained through SAPT calculation (`-q` option).
 
@@ -227,7 +227,7 @@ Here modification of the coefficients of LJ interactions between N2000 and NO3 f
 
 Short-range damping is almost always needed between small, highly charged atoms (such as H) and induced dipoles to prevent the "polarization catastrophe".
 
-    coul_tt.py -d data-p.lmp -a 3
+    coul_tt -d data-p.lmp -a 3
 
 The functional form of the damping function is an adaptation of the Tang-Toennies damping function  for dispersion interactions:
 
@@ -264,7 +264,7 @@ In this example, the damped interactions are the ones of the HN atom (index 3) w
 
 The `coul_tt` script prints the commands to be included by the user to the `in-p.lmp` file to declare the `coul/tt` pair style.
 
-    To inlcude to in-p.lmp:
+    To include in in-p.lmp:
         pair_style hybrid/overlay ... coul/tt 4 12.0
         include pair-tt.lmp
 

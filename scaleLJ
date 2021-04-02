@@ -2,13 +2,11 @@
 # scaleLJ.py - scale epsilon and sigma LJ parameters in pair.lmp LAMMPS file.
 # Agilio Padua <agilio.padua@ens-lyon.fr>
 # Kateryna Goloviznina <kateryna.goloviznina@ens-lyon.fr>
-# version 2021/02/18
+# version 2021/04/02
 
 import sys
-import math
 import argparse
 import os
-import numpy as np
 
 usage = """
 ==============================================================================
@@ -459,7 +457,7 @@ class System(object):
             i = j = 0
             for i in range(0,len(self.fragments)):
                 for j in range(i,len(self.fragments)):
-                    if (np.sign(self.fragments[i].q) != np.sign(self.fragments[j].q) or max(abs(self.fragments[i].q),abs(self.fragments[j].q)) == 0) and (self.fragments[i].scale_eps and self.fragments[j].scale_eps) and (not self.fragments[i].pol_model or not self.fragments[j].pol_model):
+                    if ((self.fragments[i].q * self.fragments[j].q <= 0.0) or max(abs(self.fragments[i].q),abs(self.fragments[j].q)) == 0) and (self.fragments[i].scale_eps and self.fragments[j].scale_eps) and (not self.fragments[i].pol_model or not self.fragments[j].pol_model):
                         d = next((x for x in ff.dimers if (x.m1.name == self.fragments[i].name and x.m2.name == self.fragments[j].name) or (x.m1.name == self.fragments[j].name and x.m2.name == self.fragments[i].name)), None)
 
                         if d is not None:

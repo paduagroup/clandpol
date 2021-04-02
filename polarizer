@@ -8,8 +8,6 @@
 import sys
 import argparse
 import random
-import math
-import shutil
 from copy import deepcopy
 
 
@@ -206,6 +204,9 @@ class Data(object):
     def extract_nonpol(self):
         """extract atom and bond info from nonpolarizable data"""
 
+        if len(self.atomtypes):
+            return
+
         # extract atom IDs
         missinglabels = False
         for line in self.sections['Masses']:
@@ -222,7 +223,7 @@ class Data(object):
             self.atomtypes.append(atomtype)
 
         if missinglabels:
-            sys.exit(0)
+            sys.exit(1)
 
         # extract atom registers
         for line in self.sections['Atoms']:
@@ -235,10 +236,25 @@ class Data(object):
             atom['x'] = float(tok[4])
             atom['y'] = float(tok[5])
             atom['z'] = float(tok[6])
-            #atom['note'] = ''.join([s + ' ' for s in tok[7:]]).strip()
             atom['note'] = ' '.join(tok[7:])
             self.atoms.append(atom)
             self.idmap[atom['n']] = atom
+
+        for line in self.sections['Bonds']:
+            tok = line.split()
+            bond = {}
+            bond['i'] = int(tok[2])
+            bond['j'] = int(tok[3])
+            bond['id'] = int(tok[1])
+            bond['note'] = ' '.join(tok[4:])
+            # identify atom types in bond
+            n_i = bond['i'] - 1
+            n_j = bond['j'] - 1
+            id_i = self.atoms[n_i]['id'] - 1
+            id_j = self.atoms[n_j]['id'] - 1
+            bond['itype'] = self.atomtypes[id_i]['type']
+            bond['jtype'] = self.atomtypes[id_j]['type']
+            self.bonds.append(bond)
 
         if 'Velocities' in self.sections:
             for line in self.sections['Velocities']:
@@ -248,13 +264,44 @@ class Data(object):
                 atom['vy'] = float(tok[2])
                 atom['vz'] = float(tok[3])
 
+    def countH(self, output=False):
+        '''count H atoms bonded to each atom type'''
+
+        if len(self.atomtypes) == 0:
+            self.extract_nonpol()
+
+        # count for all atoms
+        nH = [0] * self.headers['atoms']
+        for bd in self.bonds:
+            if bd['itype'][0] in 'Hh':
+                j = bd['j'] - 1
+                nH[j] += 1
+            elif bd['jtype'][0] in 'Hh':
+                i = bd['i'] - 1
+                nH[i] += 1
+        # transfer counts to atom types
+        self.nH = [0] * self.headers['atom types']
+        for att in self.atomtypes:
+            id = att['id']
+            for atom in self.atoms:
+                if atom['id'] == id:
+                    i = atom['n'] - 1
+                    self.nH[id-1] = nH[i]
+                    break
+        if (output):
+            for t, n in zip(self.atomtypes, self.nH):
+                print('{0:8s} {1:1d}'.format(t['type'], n))
+
+
+
     def polarize(self, drude):
         """add Drude particles"""
 
         if 'Pair Coeffs' in self.sections:
             raise RuntimeError("cannot polarize a data with Pair Coeffs")
 
-        self.extract_nonpol()
+        if len(self.atomtypes) == 0:
+            self.extract_nonpol()
 
         natom = self.headers['atoms']
         nbond = self.headers['bonds']
@@ -695,21 +742,18 @@ class Data(object):
 kcal =  4.184                           # kJ
 eV   = 96.485                           # kJ/mol
 fpe0 =  0.000719756                     # (4 Pi eps0) in e^2/(kJ/mol A)
-d_alpha_H = 0.323                       # default polarisability of H in A^3, PCCP 20(2018)10992
 
-# tolerance to deduce bonds from input configuration
-BondTol = 0.25                          # Angstrom
 
 class Drude(object):
     """specification of drude oscillator types"""
 
-    def __init__(self, sys, drudefile, kcalc = False, positive = False, metal = False):
+    def __init__(self, drudefile, data, kcalc=False, positive=False, metal=False):
         self.types = []
-        self.alpha_H = 0.0
+        self.alpha_H = 0.323           # PCCP 20(2018)10992
 
         with open(drudefile, "r") as f:
-            # search for polarisability of hydrogen in force filed file
-            h_found = False
+
+            # search for polarizability of H
             for line in f:
                 line = line.strip()
                 if line.startswith('#') or len(line) == 0:
@@ -717,26 +761,19 @@ class Drude(object):
                 if line.startswith('H'):
                     tok = line.split()
                     self.alpha_H = float(tok[4])
-                    h_found = True
                     break
-
-            if not h_found:
-                self.alpha_H = d_alpha_H
-                print('warning: polarisability of H atom is not found. Default value is {0:5.3f} (PCCP 20(2018)10992). '.format(d_alpha_H))
-
-            # read all polarisable atoms from the beginning
+            print('Polarizability of H merged into heavy atoms: {0:.3f} A3'.format(self.alpha_H))
             f.seek(0)
+
             for line in f:
                 line = line.strip()
                 if line.startswith('#') or len(line) == 0:
                     continue
                 tok = line.split()
 
-                #skip H
                 if tok[0].startswith('H'):
-                    tmp_alpha_H = float(tok[4])
-                    if tmp_alpha_H != self.alpha_H:
-                        raise Exception('  error: atomic polarisability of hydrogen atoms should have unique value ({0:5.3f} and {1:5.3f} found)'.format(self.alpha_H, tmp_alpha_H))
+                    if float(tok[4]) != self.alpha_H:
+                        print('warning: different polarizabilities for H')
                     continue
 
                 drude = {}
@@ -744,11 +781,17 @@ class Drude(object):
                 drude['dm'] = float(tok[1])
                 dq = float(tok[2])
                 k = float(tok[3])
-                alpha = float(tok[4]) # polarisability without H
+                alpha = float(tok[4])
                 drude['thole'] = float(tok[5])
 
-                # check if there are H attached to the atom; if yes, merge their polarisability
-                alpha += self.alpha_H*sys.countH(drude['type'])
+                data.countH()
+                nH = 0.0
+                for att in data.atomtypes:
+                    if att['type'] == drude['type']:
+                        id = att['id'] - 1
+                        nH = data.nH[id]
+                        break
+                alpha += nH * self.alpha_H
                 drude['alpha'] = alpha
 
                 if kcalc:
@@ -771,427 +814,6 @@ class Drude(object):
 
 # --------------------------------------
 
-class System(object):
-    """simulated system"""
-
-    def __init__(self, strfiles):
-        self.mols = []
-        try:
-            for sfile in strfiles:
-                name = sfile.split('.')[0].strip().lower()
-                if len([i for i in strfiles if name in i]) > 1:
-                    raise Exception('  error: repeating file name ' + name)
-
-                m = mol(sfile)
-                self.mols.append(m)
-                
-        except Exception as e:
-            print(e)
-            sys.exit(1)
-    
-    def countH(self, dtype):
-        dr_atoms = []
-        nH0 = 0
-        try:
-            for m in self.mols:
-                dr_atoms.extend([x for x in m.atoms if x.name == dtype])
-            if len(dr_atoms) > 0:
-                nH0 = dr_atoms[0].nH
-                if next((x for x in dr_atoms if x.nH != nH0), None) is not None:
-                    raise Exception('  error: atom type {0} has different number of hydrogens attached in structure files'.format(dtype))
-            return nH0
-
-        except Exception as e:
-            print(e)
-            sys.exit(1)
-        
-# --------------------------------------
-
-class forcefield(object):
-    """force field parameter database"""
-
-    def __init__(self, filename):
-        self.filename = filename
-        self.atoms = []
-        self.bonds = []
-
-        try:
-            with open(filename, 'r') as f:
-                for line in f:
-                    if line.startswith('#') or line.strip() == '':
-                        continue
-                
-                    if line.lower().startswith('atom'):
-                        section = 'atoms'
-                        continue
-                    elif line.lower().startswith('bond'):
-                        section = 'bonds'
-                        continue
-                    elif line.lower().startswith('angl'):
-                        section = 'angles'
-                        continue
-                    elif line.lower().startswith('dihe'):
-                        section = 'dihedrals'
-                        continue
-                    elif line.lower().startswith('impro'):
-                        section = 'improper'
-                        continue
-
-                    tok = line.strip().split()
-                    if section == 'atoms':
-                        name = tok[0]
-                        self.atoms.append(atom(name))
-                        self.atoms[len(self.atoms)-1].atype = tok[1]
-
-                    elif section == 'bonds':
-                        iatp = tok[0]
-                        jatp = tok[1]
-                        r = float(tok[3])
-                        self.bonds.append(bond(iatp,jatp,r))
-        
-        except IOError:
-            print('  error: force field file '+ filename +'not found')
-            sys.exit(1)                
-
-# --------------------------------------
-
-class atom(object):
-    """atom in a molecule or in a force field"""
-
-    def __init__(self, name):
-        self.name = name
-        self.atype = ''
-        self.x = 0.0
-        self.y = 0.0
-        self.z = 0.0
-        self.nH = 0
-
-    def __str__(self):
-        return '{0} {1} \t {2:4d} H'.format(self.name, self.atype, self.nH)
-
-# --------------------------------------
-
-class bond(object):
-    """covalent bond in a molecule or in a force field"""
-
-    def __init__(self, i , j , r = 0.0):
-        self.i = i
-        self.j = j
-        self.r = r
-
-    def checkval(self, dist):
-        delta = abs(dist - self.r)
-        return delta < BondTol
-
-    def __str__(self):
-        return '{0}-{1} {2:6.4f}'.format(self.i.name, self.j.name, self.r)
-
-# --------------------------------------
-
-class zmat(object):
-    """z-matrix representing a molecule, read from .zmat file"""
-
-    def __init__(self, filename):
-        self.zatom = []
-        self.connect = []
-        self.improper = []
-        
-        with open(filename, 'r') as f:
-
-            # read molecule name
-            line = f.readline()
-            while line.strip().startswith('#'):
-                line = f.readline()
-            self.name = line.strip()
-
-            #read z-matrix
-            line = f.readline()
-            while line.strip().startswith('#') or line.strip() == '':
-                line = f.readline()
-            
-            tok = line.strip().split()
-            if len(tok) > 1:   # there can be line numbers
-                shift = 1
-            else:
-                shift = 0
-
-            variables = False
-            while line and not line.strip().lower().startswith('var'):
-                tok = line.strip().split()
-                if len(tok) == 0:
-                    break
-                name = tok[shift]
-                ir = ia = id = 0
-                r = a = d = 0.0
-                rvar = avar = dvar = ''
-                if (len(tok) - shift) > 1:
-                    ir = int(tok[shift+1])
-                    if tok[shift+2][0].isalpha():
-                        rvar = tok[shift+2]
-                        variables = True
-                    else:
-                        r = float(tok[shift+2])
-                    if (len(tok) - shift) > 3:
-                        ia = int(tok[shift+3])
-                        if tok[shift+4][0].isalpha():
-                            avar = tok[shift+4]
-                            variables = True
-                        else:
-                            a = float(tok[shift+4])
-                        if (len(tok) - shift) > 5:
-                            id = int(tok[shift+5])
-                            if tok[shift+6][0].isalpha():
-                                dvar = tok[shift+6]
-                                variables = True
-                            else:
-                                d = float(tok[shift+6])
-                zatom = {'name': name,
-                        'ir': ir, 'rvar': rvar, 'r': r,
-                        'ia': ia, 'avar': avar, 'a': a,
-                        'id': id, 'dvar': dvar, 'd': d}
-                self.zatom.append(zatom)
-                line = f.readline()
-                
-            # read variables
-            if variables:
-                if line.strip().lower().startswith('var') or line.strip() == '':
-                    line = f.readline()
-                while line:
-                    tok = line.strip().split('=')
-                    if len(tok) < 2:
-                        break
-                    key = tok[0].strip()
-                    val = float(tok[1])
-                    for rec in self.zatom:
-                        if rec['rvar'] == key:
-                            rec['r'] = val
-                        if rec['avar'] == key:
-                            rec['a'] = val
-                        if rec['dvar'] == key:
-                            rec['d'] = val
-                    line = f.readline()
-                        
-            # read connects, improper, force field file
-            self.ff = ''
-            self.guessconnect = False
-            while line:
-                if line.strip().startswith('#') or line.strip() == '':
-                    line = f.readline()
-                    continue
-                tok = line.strip().split()
-                if tok[0] == 'reconnect':
-                    self.guessconnect = True
-                if tok[0] == 'connect':
-                    atomi = int(tok[1])
-                    atomj = int(tok[2])
-                    self.connect.append([atomi, atomj])
-                elif tok[0] == 'improper':
-                    atomi = int(tok[1])
-                    atomj = int(tok[2])
-                    atomk = int(tok[3])
-                    atoml = int(tok[4])
-                    self.improper.append([atomi, atomj, atomk, atoml])
-                else:
-                    self.ff = tok[0]
-                line = f.readline()
-
-# --------------------------------------
-
-class mol(object):
-    """molecule"""
-
-    def __init__(self, filename):
-        self.atoms = []
-        self.bonds = []
-        self.nmol = 0
-        
-        try:
-            with open(filename, 'r'):
-                self.filename = filename
-            ext = filename.split('.')[-1].strip().lower()
-            if ext == 'zmat':
-                self.fromzmat(filename)
-            elif ext == 'mol':
-                self.frommdlmol(filename)
-            elif ext == 'xyz':
-                self.fromxyz(filename)
-            elif ext == 'pdb':
-                self.frompdb(filename)
-            else:
-                print('  error: unsupported molecule file extension')
-                sys.exit(1)
-        except IOError:
-            print('  error: molecule file not found')
-            sys.exit(1)
-    
-    def fromzmat(self, filename):
-        z = zmat(filename)
-        self.name = z.name
-        self.guessconnect = z.guessconnect
-        self.ff_file = z.ff
-        for zat in z.zatom:
-            self.atoms.append(atom(zat['name']))
-        if not self.guessconnect:
-            self.atomtypes()
-            for i in range(1, len(z.zatom)):
-                self.bonds.append(bond( self.atoms[i],  self.atoms[z.zatom[i]['ir'] - 1], z.zatom[i]['r']))
-                if self.atoms[i].name.startswith('H'):
-                    self.atoms[z.zatom[i]['ir'] - 1].nH += 1
-                elif self.atoms[z.zatom[i]['ir'] - 1].name.startswith('H'):
-                    self.atoms[i].nH += 1
-            for cn in z.connect:
-                self.bonds.append(bond( self.atoms[cn[0] - 1],  self.atoms[cn[1] - 1]))
-                if self.atoms[cn[0] - 1].name.startswith('H'):
-                    self.atoms[cn[1] - 1].nH += 1
-                elif self.atoms[cn[1] - 1].name.startswith('H'):
-                    self.atoms[cn[0] - 1].nH += 1
-        else:
-            self.connectivity()
-
-        return self
-
-    def frommdlmol(self, filename):
-        with open(filename, 'r') as f:
-            tok = f.readline().strip().split()
-            self.name = tok[0]            # molecule name
-            self.guessconnect = False
-            if len(tok) > 1:              # and eventually ff file
-                self.ff_file = tok[1]
-                if len(tok) > 2:
-                    if tok[2].startswith('rec'):
-                        self.guessconnect = True
-            else:
-                raise Exception('  error: force field file name not found in ' + filename)
-            f.readline()                  # program/date info
-            line = f.readline().strip()   # comment (eventually ff file)
-            if line and not line.startswith('#'):
-                tok = line.split()
-                self.ff_file = tok[0]
-                if len(tok) > 1:
-                    if tok[1].startswith('rec'):
-                        self.guessconnect = True
-            tok = f.readline().strip().split()   # counts line
-            natom = int(tok[0])
-            nbond = int(tok[1])
-            
-            self.atoms = [None] * natom
-            for i in range(natom):
-                tok = f.readline().strip().split()
-                self.atoms[i] = atom(tok[3])
-                self.atoms[i].x = float(tok[0])
-                self.atoms[i].y = float(tok[1])
-                self.atoms[i].z = float(tok[2])
-
-            if not self.guessconnect:
-                self.atomtypes()
-                self.bonds = [None] * nbond
-                for k in range(nbond):
-                    tok = f.readline().strip().split()
-                    i = int(tok[0]) - 1
-                    j = int(tok[1]) - 1
-                    ati =  self.atoms[i]
-                    atj =  self.atoms[j]
-                    self.bonds[k] = bond(ati, atj)
-
-                    if self.atoms[i].name.startswith('H'):
-                        self.atoms[j].nH += 1
-                    elif self.atoms[j].name.startswith('H'):
-                        self.atoms[i].nH += 1
-            else:
-                self.connectivity()
-
-        return self
-
-
-    def frompdb(self, filename):
-        with open(filename, 'r') as f:
-            line = f.readline()
-            while 'COMPND' not in line:
-                line = f.readline()
-            tok = line.strip().split()
-            if len(tok) < 3:
-                raise Exception('  error: force field file name not found in ' + filename)
-            self.name = tok[1]
-            self.ff_file = tok[2]
-            line = f.readline()
-            while not (line.startswith('ATOM') or line.startswith('HETATM')):
-                line = f.readline()
-            self.atoms = []
-            i = 0
-            while 'ATOM' in line or 'HETATM' in line:
-                tok = line.strip().split()
-                atname = tok[2]
-                self.atoms.append(atom(atname))
-                self.atoms[i].x = float(tok[5])
-                self.atoms[i].y = float(tok[6])
-                self.atoms[i].z = float(tok[7])
-                i += 1
-                line = f.readline()
-            self.connectivity()
-
-        return self
-
-    def fromxyz(self, filename):
-        try:
-            with open(filename, 'r') as f:
-                natom = int(f.readline().strip())
-                self.atoms = [None] * natom
-                tok = f.readline().strip().split()
-                self.name = tok[0]            # molecule name
-                if len(tok) > 1:              # and eventually ff file
-                    self.ff_file = tok[-1]
-                else:
-                    raise Exception('  error: force field file name not found in ' + filename)
-                for i in range(natom):
-                    tok = f.readline().strip().split()
-                    self.atoms[i] = atom(tok[0])
-                    self.atoms[i].x = float(tok[1])
-                    self.atoms[i].y = float(tok[2])
-                    self.atoms[i].z = float(tok[3])
-                self.connectivity()
-            return self
-
-        except Exception as e:
-            print(e)
-            sys.exit(1) 
-
-    def atomtypes(self):
-        self.ff = forcefield(self.ff_file)
-        natom = len(self.atoms)
-            
-        for k in range(0, natom):
-            self.atoms[k].atype = next((x for x in self.ff.atoms if x.name == self.atoms[k].name), None).atype
-
-    def connectivity(self):    
-        """determine connectivity from bond distances in force field"""
-        try:
-            natom = len(self.atoms)
-            self.atomtypes()
-            
-            for i in range(0, natom-1):
-                for j in range(i+1, natom):
-                    r = self.dist2atoms(self.atoms[i], self.atoms[j])
-                    ffbd = next((x for x in self.ff.bonds if (x.i == self.atoms[i].atype and x.j == self.atoms[j].atype) or (x.i == self.atoms[j].atype and x.j == self.atoms[i].atype)), None)                  
-                    if ffbd is not None and ffbd.checkval(r):
-                        self.bonds.append(bond(self.atoms[i], self.atoms[j], r))
-                                               
-                        if self.atoms[i].name.startswith('H'):
-                            self.atoms[j].nH += 1
-                        elif self.atoms[j].name.startswith('H'):
-                            self.atoms[i].nH += 1
-
-        except Exception as e:
-            print(e)
-            sys.exit(1)
-
-    def dist2atoms(self, ati, atj):
-        dx = atj.x - ati.x
-        dy = atj.y - ati.y
-        dz = atj.z - ati.z
-        return math.sqrt(dx*dx + dy*dy + dz*dz)
-
-    
-# --------------------------------------
 
 def main():
     parser = argparse.ArgumentParser(description = usage,
@@ -1200,8 +822,8 @@ def main():
                         help = 'Drude parameter file (default: alpha.ff)')
     parser.add_argument('-k', '--kcalc', action = 'store_true',
                         help = 'Drude force constants calculated from '\
-                        'polarisability (default: k from parameter file '\
-                        'and q from polarisability)')
+                        'polarizability (default: k from parameter file '\
+                        'and q from polarizability)')
     parser.add_argument('-p', '--positive', action = 'store_true',
                         help = 'Drude particles with positive charge '\
                         '(default: negative charge)')
@@ -1214,25 +836,20 @@ def main():
     parser.add_argument('-d', '--depolarize', action = 'store_true',
                         help = 'remove Drude dipole polarization from '\
                         'LAMMPS data file')
-    parser.add_argument('strfiles', nargs='+',
-                        help = 'infile1 [infile2 ...], '\
-                        '. Use extension .zmat, .mol or .xyz')
-    parser.add_argument('-id', '--indfile', default = 'data.lmp',
-                        help = 'input LAMMPS data file (default: data.lmp)')
-    parser.add_argument('-od', '--outdfile', default = 'data-p.lmp',
-                        help = 'output LAMMPS data file (default: data-p.lmp)')
+    parser.add_argument('infile', help = 'input LAMMPS data file')
+    parser.add_argument('outfile', help = 'output LAMMPS data file')
     
     args = parser.parse_args()
 
-    data = Data(args.indfile)
-    sys = System(args.strfiles)
-    drude = Drude(sys, args.ffdrude, args.kcalc, args.positive, args.metal)
+    data = Data(args.infile)
+    drude = Drude(args.ffdrude, data, args.kcalc, args.positive, args.metal)
     if not args.depolarize:
         data.polarize(drude)
-        data.lmpscript(drude, args.outdfile, args.thole, args.cutoff)
+        data.lmpscript(drude, args.outfile, args.thole, args.cutoff)
     else:
         data.depolarize(drude)
-    data.write(args.outdfile)
+    data.write(args.outfile)
+
 
 if __name__ == '__main__':
     main()
