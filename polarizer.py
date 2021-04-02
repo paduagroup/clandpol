@@ -21,8 +21,8 @@ Format of file containing specification of Drude oscillators (alpha.ff):
   # type  dm/u  dq/e  k/(kJ/molA2)  alpha/A3  thole
   C3H     1.0   0.0   4184.0        1.016     2.6
   ...
-* dm is the mass to place on the Drude particle (taken from its core),
-* dq is the charge to place on the Drude particle (taken from its core),
+* dm is the mass to place on the Drude particle (subtracted from its core),
+* dq is the charge to place on the Drude particle (subtracted from its core),
 * k is the harmonic force constant of the bond between core and Drude,
 * alpha is the polarizability, hyrdogen aroms are not merged,
 * thole is a parameter of the Thole damping function.
@@ -703,7 +703,7 @@ BondTol = 0.25                          # Angstrom
 class Drude(object):
     """specification of drude oscillator types"""
 
-    def __init__(self, sys, drudefile, polar = '', positive = False, metal = False):
+    def __init__(self, sys, drudefile, kcalc = False, positive = False, metal = False):
         self.types = []
         self.alpha_H = 0.0
 
@@ -751,10 +751,10 @@ class Drude(object):
                 alpha += self.alpha_H*sys.countH(drude['type'])
                 drude['alpha'] = alpha
 
-                if polar == 'q':
-                    dq = (fpe0 * k * alpha)**0.5
-                elif polar == 'k':
+                if kcalc:
                     k = dq*dq / (fpe0 * alpha)
+                else:
+                    dq = (fpe0 * k * alpha)**0.5
 
                 if positive:
                     drude['dq'] = abs(dq)
@@ -1198,19 +1198,17 @@ def main():
              formatter_class = argparse.RawTextHelpFormatter)
     parser.add_argument('-f', '--ffdrude', default = 'alpha.ff',
                         help = 'Drude parameter file (default: alpha.ff)')
-    parser.add_argument('-t', '--thole', type = float, default = 2.6,
-                        help = 'Thole damping parameter (default: 2.6)')
-    parser.add_argument('-c', '--cutoff', type = float, default = 12.0,
-                        help = 'distance cutoff/A (default: 12.0)')
-    parser.add_argument('-q', '--qcalc', action = 'store_true',
-                        help = 'Drude charges calculated from polarisability '\
-                        '(default: q value from parameter file)')
     parser.add_argument('-k', '--kcalc', action = 'store_true',
                         help = 'Drude force constants calculated from '\
-                        'polarisability (default: k value from parameter file)')
+                        'polarisability (default: k from parameter file '\
+                        'and q from polarisability)')
     parser.add_argument('-p', '--positive', action = 'store_true',
-                        help = 'Drude particles have positive charge '\
+                        help = 'Drude particles with positive charge '\
                         '(default: negative charge)')
+    parser.add_argument('-t', '--thole', type = float, default = 2.6,
+                        help = 'global Thole damping parameter (default: 2.6)')
+    parser.add_argument('-c', '--cutoff', type = float, default = 12.0,
+                        help = 'global distance cutoff/A (default: 12.0)')
     parser.add_argument('-m', '--metal', action = 'store_true',
                         help = 'LAMMPS metal units (default: real units)')
     parser.add_argument('-d', '--depolarize', action = 'store_true',
@@ -1226,16 +1224,9 @@ def main():
     
     args = parser.parse_args()
 
-    if args.qcalc:
-        polar = 'q'
-    elif args.kcalc:
-        polar = 'k'
-    else:
-        polar = ''
-
     data = Data(args.indfile)
     sys = System(args.strfiles)
-    drude = Drude(sys, args.ffdrude, polar, args.positive, args.metal)
+    drude = Drude(sys, args.ffdrude, args.kcalc, args.positive, args.metal)
     if not args.depolarize:
         data.polarize(drude)
         data.lmpscript(drude, args.outdfile, args.thole, args.cutoff)
