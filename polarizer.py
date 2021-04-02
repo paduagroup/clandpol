@@ -3,7 +3,7 @@
 # Agilio Padua <agilio.padua@ens-lyon.fr>
 # Alain Dequidt <alain.dequidt@uca.fr>
 # Kateryna Goloviznina <kateryna.goloviznina@ens-lyon.fr>
-# version 2021/02/18
+# version 2021/04/02
 
 import sys
 import argparse
@@ -736,7 +736,7 @@ class Drude(object):
                 if tok[0].startswith('H'):
                     tmp_alpha_H = float(tok[4])
                     if tmp_alpha_H != self.alpha_H:
-                        raise Exception('  error: atomic polarisability of hydrogen atoms should have unique value ({0:5.3f} and {0:5.3f} found)'.format(self.alpha_H, tmp_alpha_H))
+                        raise Exception('  error: atomic polarisability of hydrogen atoms should have unique value ({0:5.3f} and {1:5.3f} found)'.format(self.alpha_H, tmp_alpha_H))
                     continue
 
                 drude = {}
@@ -840,7 +840,6 @@ class forcefield(object):
                     tok = line.strip().split()
                     if section == 'atoms':
                         name = tok[0]
-                        atype = tok[1]
                         self.atoms.append(atom(name))
                         self.atoms[len(self.atoms)-1].atype = tok[1]
 
