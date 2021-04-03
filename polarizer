@@ -766,6 +766,8 @@ class Drude(object):
             print('Polarizability of H merged into heavy atoms: {0:.3f} A3'.format(self.alpha_H))
             f.seek(0)
 
+            data.countH()
+            
             for line in f:
                 line = line.strip()
                 if line.startswith('#') or len(line) == 0:
@@ -785,7 +787,6 @@ class Drude(object):
                 alpha = float(tok[4])
                 drude['thole'] = float(tok[5])
 
-                data.countH()
                 for att in data.atomtypes:
                     if att['type'] == drude['type']:
                         id = att['id'] - 1
