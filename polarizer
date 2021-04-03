@@ -3,9 +3,8 @@
 # Agilio Padua <agilio.padua@ens-lyon.fr>
 # Alain Dequidt <alain.dequidt@uca.fr>
 # Kateryna Goloviznina <kateryna.goloviznina@ens-lyon.fr>
-# version 2021/04/02
+# version 2021/04/03
 
-import sys
 import argparse
 import random
 from copy import deepcopy
@@ -223,7 +222,7 @@ class Data(object):
             self.atomtypes.append(atomtype)
 
         if missinglabels:
-            sys.exit(1)
+            raise RuntimeError("missing atom labels")
 
         # extract atom registers
         for line in self.sections['Atoms']:
@@ -420,7 +419,7 @@ class Data(object):
             self.atomtypes.append(att)
 
 
-    def extract_pol(self, drude):
+    def extract_pol(self):
         """extract atom, drude, bonds info from polarizable data"""
 
         # extract atom IDs
@@ -498,11 +497,10 @@ class Data(object):
                 atom['vy'] = float(tok[2])
                 atom['vz'] = float(tok[3])
 
-
-    def depolarize(self, drude):
+    def depolarize(self):
         """remove Drude particles"""
 
-        self.extract_pol(drude)
+        self.extract_pol()
 
         atom_tp_map = {}
         bond_tp_map = {}
@@ -663,7 +661,7 @@ class Data(object):
               "polarization written to " + inpstack)
         print("Pair coefficients for Thole damping "\
               "written to " + pairfile)
-        print("Simulation box "\
+        print("LAMMPS data file with Drude dipoles "\
               "written to " + outdfile)
 
         with open(inpstack, 'w') as f:
@@ -838,16 +836,15 @@ def main():
                         'LAMMPS data file')
     parser.add_argument('infile', help = 'input LAMMPS data file')
     parser.add_argument('outfile', help = 'output LAMMPS data file')
-    
     args = parser.parse_args()
 
     data = Data(args.infile)
-    drude = Drude(args.ffdrude, data, args.kcalc, args.positive, args.metal)
     if not args.depolarize:
+        drude = Drude(args.ffdrude, data, args.kcalc, args.positive, args.metal)
         data.polarize(drude)
         data.lmpscript(drude, args.outfile, args.thole, args.cutoff)
     else:
-        data.depolarize(drude)
+        data.depolarize()
     data.write(args.outfile)
 
 
