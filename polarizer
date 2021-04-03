@@ -786,13 +786,11 @@ class Drude(object):
                 drude['thole'] = float(tok[5])
 
                 data.countH()
-                nH = 0.0
                 for att in data.atomtypes:
                     if att['type'] == drude['type']:
                         id = att['id'] - 1
-                        nH = data.nH[id]
+                        alpha += data.nH[id] * self.alpha_H
                         break
-                alpha += nH * self.alpha_H
                 drude['alpha'] = alpha
 
                 if kcalc:
