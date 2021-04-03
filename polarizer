@@ -713,6 +713,9 @@ class Data(object):
             f.write("fix TSTAT all tgnpt/drude temp ${TK} ${TK} 100 "\
                     "${TDRUDE} 20 iso ${PBAR} ${PBAR} 1000\n\n")
 
+            f.write("# zero linear momentum (may not be needed)\n")
+            f.write("fix ICECUBE all momentum 1000 linear 1 1 1\n\n")
+
             f.write("# output the temperatures of molecular COM, "\
                     "COM of DC-DP, and DP\n")
             f.write("thermo_style custom step [...] "\
