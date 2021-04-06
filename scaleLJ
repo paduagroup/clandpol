@@ -616,7 +616,7 @@ def PrintReport(syst, sapt, scsig, polarisable):
         report += '    k_pred'
 
     for frp in syst.fragmentpairs:
-        report += '\n{0:10s}   {0:10s}'.format(frp.fr1.name, frp.fr2.name)
+        report += '\n{0:10s}   {1:10s}'.format(frp.fr1.name, frp.fr2.name)
         if sapt:
             report += '  {0:6.2f}'.format(frp.k_sapt)
         elif frp.k_sapt is None:
