@@ -24,9 +24,6 @@ Format of file containing specification of Drude oscillators (alpha.ff):
 * alpha is the polarizability, hyrdogen aroms are not merged,
 * thole is a parameter of the Thole damping function.
 ------------------------------------------------------------------------------
-Script requires structure files of ions/molecules in the system
-(.zmat, .xyz, .mol, .pdb) and corresponding force field files (il.ff)
-------------------------------------------------------------------------------
 A Drude particle is created for each atom in the LAMMPS data file
 that corresponds to an atom type given in the Drude file.
 Since LAMMPS uses numbers for atom types in the data file, a comment
