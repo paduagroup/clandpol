@@ -632,8 +632,8 @@ def main():
     parser.add_argument('-f', '--ff_filename', type=str, default = 'fragment.ff', help = 'fragment force field (default: fragment.ff)')
     parser.add_argument('-a', '--alpha_filename', type=str, default = 'alpha.ff', help = 'polarisability values file (default: alpha.ff)')
     parser.add_argument('-i', '--input_filename', type=str, default = 'fragment.inp', help = 'fragment input file with atomic indices (default: fragment.inp)')
-    parser.add_argument('-ip', '--pair_in_filename', type=str, default = 'pair-p.lmp', help = 'pair style input file (default: pair-p.lmp)')
-    parser.add_argument('-op', '--pair_out_filename', type=str, default = 'pair-p-sc.lmp', help = 'pair style output file (default: pair-p-sc.lmp)')
+    parser.add_argument('-ip', '--pair_in_filename', type=str, default = 'pair.lmp', help = 'pair style input file (default: pair.lmp)')
+    parser.add_argument('-op', '--pair_out_filename', type=str, default = 'pair-sc.lmp', help = 'pair style output file (default: pair-sc.lmp)')
     parser.add_argument('-q', '--sapt', action = 'store_true', help = 'use sapt calculated k values, default: use predicted k values')
     parser.add_argument('-s', '--scsig', nargs='*', type = str,  help = 'scale sigma if specified; default value: 0.985; \n\
     -s                       - scale all fragments\' sigma by 0.985 \n\
