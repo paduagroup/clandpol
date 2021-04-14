@@ -10,6 +10,7 @@ dihedral_style opls
 
 special_bonds lj/coul 0.0 0.0 0.5
 
+# remove hybrid if not necessary
 pair_style hybrid lj/cut/coul/long 12.0 12.0
 pair_modify tail yes
 kspace_style pppm 1.0e-5
@@ -38,13 +39,8 @@ fix TPSTAT all npt temp ${TK} ${TK} 100 iso ${PBAR} ${PBAR} 1000
 thermo_style custom step cpu etotal ke pe evdwl ecoul elong temp press vol density
 thermo 1000
 
-dump TRAJ all custom 1000 dump.lammpstrj id mol type element q x y z ix iy iz
+dump TRAJ all custom 1000 dump.lammpstrj id mol type element q xu yu zu
 dump_modify TRAJ element N C C C H C H H C C H C N C N
-
-variable t equal time
-compute MSD all msd com yes
-variable msd equal c_MSD[4]
-fix PRMSD all print 2000 "${t} ${msd}" file msd.lammps screen no
 
 variable vinst equal vol
 fix VAVG all ave/time 10 1000 50000 v_vinst
