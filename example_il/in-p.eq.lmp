@@ -36,12 +36,13 @@ timestep 1.0
 
 variable TK equal 300.0
 variable TDRUDE equal 1.0
-variable PBAR equal 1.0
+# variable PBAR equal 1.0
 
 comm_modify vel yes
 velocity ATOMS create ${TK} 12345
 
-fix TSTAT all tgnpt/drude temp ${TK} ${TK} 100 ${TDRUDE} 20 iso ${PBAR} ${PBAR} 1000
+fix TSTAT all tgnvt/drude temp ${TK} ${TK} 100 ${TDRUDE} 20
+# fix TSTAT all tgnpt/drude temp ${TK} ${TK} 100 ${TDRUDE} 20 iso ${PBAR} ${PBAR} 1000
 
 thermo_style custom step time cpu etotal ke pe ebond eangle evdwl ecoul elong &
   press vol density f_TSTAT[1] f_TSTAT[2] f_TSTAT[3]
