@@ -14,7 +14,7 @@ Follow the [tutorial](https://github.com/kateryna-goloviznina/pol_il/tree/master
         coul_tt -a 8 13
         scaleLJ -s
 
-2. Step 3. According to our recently published paper, the sigma LJ parameter of all O-Cl interactions (in particular, OH and OHG atom types) should be increased from 3.37 Å to 3.70 Å when Cl Lennard-Jones parameters from JPCB 108 (2004) 2038 are used. Hovewer, this step is not required when Cl force filed parameters are taken directly from OPLS-AA force field as given in `des.ff` file.
+2. Step 3. According to our recently published paper, the sigma LJ parameter of all O-Cl interactions (in particular, OH and OHG atom types) should be increased from 3.37 Å to 3.70 Å when Cl Lennard-Jones parameters from JPCB 108 (2004) 2038 are used. Hovewer, this step is not required when Cl force field parameters are taken directly from OPLS-AA force field as given in `des.ff` file.
 
 ## References
 
