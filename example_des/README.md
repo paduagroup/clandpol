@@ -10,18 +10,14 @@ Follow the [tutorial](https://github.com/kateryna-goloviznina/pol_il/tree/master
         fftool 1 ch.xyz 1 Cl.zmat 2 EG.zmat -b 20
         packmol <pack.inp
         fftool 1 ch.xyz 1 Cl.zmat 2 EG.zmat -b 20 -a -l
-        python polarizer.py ch.xyz Cl.zmat EG.zmat -f alpha.ff -q
-        python coul_tt.py -a 8 13
-        python scaleLJ.py
+        polarizer data.lmp data-p.lmp
+        coul_tt -a 8 13
+        scaleLJ -s
 
-2. Step 3. The sigma LJ parameter of all O-Cl interactions (in particular, OH and OHG atom types) should be increased from 3.37 Å to 3.70 Å. 
+2. Step 3. According to our recently published paper, the sigma LJ parameter of all O-Cl interactions (in particular, OH and OHG atom types) should be increased from 3.37 Å to 3.70 Å when Cl Lennard-Jones parameters from JPCB 108 (2004) 2038 are used. Hovewer, this step is not required when Cl force filed parameters are taken directly from OPLS-AA force field as given in `des.ff` file.
 
-    The `pair_coeff` parameters of the interaction between N1 and ON atoms in the `pair-p-sc.lmp` file
+## References
 
-        pair_coeff    7    9 lj/cut/coul/long     0.088409     3.374611  # OH Cl
-        pair_coeff    9   11 lj/cut/coul/long     0.110864     3.374611  # Cl OHG
-
-    should be replaced by
-
-        pair_coeff    7    9 lj/cut/coul/long     0.088409     3.700000  # OH Cl
-        pair_coeff    9   11 lj/cut/coul/long     0.110864     3.700000  # Cl OHG
+* CL&Pol for PIL, DES, electrolytes: K. Goloviznina, Z. Gong, M. Costa Gomes,
+  A. A. H. Pádua, J. Chem. Theory Comput. (2021) DOI:
+  [10.26434/10.1021/acs.jctc.0c01002](https://doi.org/10.1021/acs.jctc.0c01002), ChemRxiv [10.26434/chemrxiv.12999524](https://doi.org/10.26434/chemrxiv.12999524)

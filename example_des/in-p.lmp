@@ -1,0 +1,46 @@
+# Commands to include in the LAMMPS input stack
+
+# adapt the pair_style command as needed
+pair_style hybrid/overlay [...] coul/long/cs 12.0 thole 2.600 12.0
+
+# new data file with Drude oscillators added
+read_data data-p.lmp
+
+# read pair interactions involving Drude particles
+# Thole damping recommended if more than 1 Drude per molecule
+include pair-drude.lmp
+
+# convenient atom groups (for shake, thermostats...)
+group ATOMS type 1 2 3 4 5 6 7 8 9 10 11 12 13
+group CORES type 1 2 4 5 7 9 10 11
+group DRUDES type 14 15 16 17 18 19 20 21
+
+# identify each atom type: [C]ore, [D]rude, [N]on-polarizable
+fix DRUDE all drude C C N C C N C N C C C N N D D D D D D D D
+
+# store velocity information of ghost atoms
+comm_modify vel yes
+
+variable TK equal 300.0
+variable TDRUDE equal 1.0
+variable PBAR equal 1.0
+
+# temperature-grouped multiple Nose-Hoover thermostats  and barostat
+fix TSTAT all tgnpt/drude temp ${TK} ${TK} 100 ${TDRUDE} 20 iso ${PBAR} ${PBAR} 1000
+
+# zero linear momentum (may not be needed)
+fix ICECUBE all momentum 1000 linear 1 1 1
+
+# output the temperatures of molecular COM, COM of DC-DP, and DP
+thermo_style custom step [...] f_TSTAT[1] f_TSTAT[2] f_TSTAT[3]
+
+# write Drude particles to dump file
+dump_modify ... element ... D D D D D D D D
+
+# ATTENTION!
+#  * read_data may need 'extra/special/per/atom' keyword, LAMMPS will exit with a message
+#  * if using fix shake the group-ID must not include Drude particles; use group ATOMS
+#  * give all I<=J pair interactions, no mixing
+#  * pair style coul/long/cs from CORESHELL package is used for interactions of DP;
+#    alternatively pair lj/cut/thole/long could be used avoiding hybrid/overlay and
+#    allowing mixing; see doc pages.

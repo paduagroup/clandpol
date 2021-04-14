@@ -1,4 +1,4 @@
-# il.ff, version 2019/10/15
+# des.ff, version 2021/04/14
 # Molecular force field for ionic liquids
 # Agilio Padua, J.N. Canongia Lopes
 # contributors: K. Shimizu, A. Podgorsek, F. Hammami, L. Gontrani, M. Mishra,
@@ -32,9 +32,13 @@ P3    PT  30.974   0.68   lj    3.74   0.83680
 C1P   CT  12.011  -0.31   lj    3.50   0.27614
 C1B   CT  12.011  -0.31   lj    3.50   0.27614
 # chloride JPCB 108 (2004) 2038
-Cl    Cl  35.453  -1.00   lj    3.65   0.83000
+#Cl    Cl   35.453  -1.00   lj    3.65   0.83000
+# chloride OPLS
+Cl    Cl   35.453  -1.00   lj    4.41724 0.492833
 # bromide JPCB 110 (2006) 19586
-Br    Br  79.904  -1.00   lj    3.97   0.86000
+#Br    Br   79.904  -1.00   lj    3.97   0.86000
+# bromide OPLS
+Br    Br   79.904  -1.00   lj    4.62376 0.376560
 # alcohols OPLS-AA JACS 118 (1996) 11225; JPC 100 (1996) 18010
 CTO   CT  12.011   0.145  lj    3.50   0.27614  
 C2O   CT  12.011   0.205  lj    3.50   0.27614  
@@ -82,15 +86,15 @@ PT  CT   harm   1.81    3550.0
 # hydroxyl OPLS-AA JACS 118(1996)11225, JPC 100(1996)18010
 CT  OH   harm   1.410   2677.8
 HO  OH   cons   0.945   4627.5
-# urea
+# urea OPLS-AA
 C   O    harm   1.229   4769.8
 C   N    harm   1.335   4100.3
 N   H    cons   1.010   3631.7
-# carboxilic acid
+# carboxilic acid OPLS-AA
 CO  O3   harm   1.229   4769.8
 CO  OH   cons   1.364   3765.6
 CT  CO   harm   1.522   2653.0 
-# ketone
+# ketone OPLS-AA
 CK  OK   harm   1.229   4769.8
 CT  CK   harm   1.522   2653.0
 
