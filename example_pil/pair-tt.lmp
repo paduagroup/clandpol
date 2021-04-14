@@ -1,0 +1,7 @@
+# Tang-Toennies charge-dipole damping
+pair_coeff    1    3 coul/tt 4.5 1.0
+pair_coeff    2    3 coul/tt 4.5 1.0
+pair_coeff    3    4 coul/tt 4.5 1.0
+pair_coeff    3    7 coul/tt 4.5 1.0
+pair_coeff    3    8 coul/tt 4.5 1.0
+pair_coeff    3   9* coul/tt 4.5 1.0
