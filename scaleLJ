@@ -235,9 +235,10 @@ class Fragment(Monomer):
                 at_name = tok[3]
                 print(at_name)
                 atom = next((x for x in pol.atomtypes if x.name == at_name), None)
-                if atom is None:
-                    raise Exception('  error: atom type {0} not found in {1}'.format(at_name,pol.filename))
-                atoms.append(atom)
+                if atom is not None:
+                    atoms.append(atom)  
+                else:
+                    print('warning:  error: atom type {0} not found in {1}'.format(at_name,pol.filename))
         self.atoms = atoms
 
     # read atoms from .pdb for a given fragment
@@ -257,9 +258,10 @@ class Fragment(Monomer):
                 tok = line.strip().split()
                 at_name = tok[2]
                 atom = next((x for x in pol.atomtypes if x.name == at_name), None)
-                if atom is None:
-                    raise Exception('  error: atom type {0} not found in {1}'.format(at_name,pol.filename))
-                atoms.append(atom)
+                if atom is not None:
+                    atoms.append(atom)  
+                else:
+                    print('warning:  error: atom type {0} not found in {1}'.format(at_name,pol.filename))
                 line = f.readline()
         self.atoms = atoms
 
@@ -288,9 +290,10 @@ class Fragment(Monomer):
                         break
                     at_name = tok[shift]
                     atom = next((x for x in pol.atomtypes if x.name == at_name), None)
-                    if atom is None:
-                        raise Exception('  error: atom type {0} not found in {1}'.format(at_name,pol.filename))
-                    atoms.append(atom)
+                    if atom is not None:
+                        atoms.append(atom)  
+                    else:
+                        print('warning:  error: atom type {0} not found in {1}'.format(at_name,pol.filename))
                     line = f.readline()
             self.atoms = atoms
                             
@@ -324,9 +327,10 @@ class Fragment(Monomer):
                         break
                     at_name = tok[0]
                     atom = next((x for x in pol.atomtypes if x.name == at_name), None)
-                    if atom is None:
-                        raise Exception('  error: atom type {0} not found in {1}'.format(at_name,pol.filename))
-                    atoms.append(atom)
+                    if atom is not None:
+                        atoms.append(atom)  
+                    else:
+                        print('warning:  error: atom type {0} not found in {1}'.format(at_name,pol.filename))
                     line = f.readline()
             self.atoms = atoms
                             
