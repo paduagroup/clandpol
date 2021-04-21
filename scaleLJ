@@ -2,7 +2,7 @@
 # scaleLJ.py - scale epsilon and sigma LJ parameters in pair.lmp LAMMPS file.
 # Agilio Padua <agilio.padua@ens-lyon.fr>
 # Kateryna Goloviznina <kateryna.goloviznina@ens-lyon.fr>
-# version 2021/04/02
+# version 2021/04/21
 
 import sys
 import argparse
@@ -664,6 +664,7 @@ def main():
     
     res = ScaleLJ.Scale(args.pair_in_filename,ff,syst,args.sapt,args.scsig)
     ScaleLJ.WriteResultToFile(args.pair_out_filename, res)
+    print('scaled LJ parameters written to ', args.pair_out_filename)
 
     PrintReport(syst,args.sapt,args.scsig,args.polarisable)
     
