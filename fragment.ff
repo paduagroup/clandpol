@@ -1,4 +1,4 @@
-# fragment.ff, version 18/12/19
+# fragment.ff, version 2021/04/20
 # Polarisable force field for ionic liquids
 # Agilio Padua <agilio.padua@ens-lyon.fr>
 # Kateryna Goloviznina <kateryna.goloviznina@ens-lyon.fr>
@@ -35,6 +35,7 @@ br          -1.0      0.0000
 C4H10        0.0      0.0000
 C4F10        0.0      0.0236      
 C6H14        0.0      0.0000
+c6h12        0.0      0.0000
 dme          0.0      1.2442
 tol          0.0      0.2802
 bz           0.0      0.0000 
@@ -62,6 +63,7 @@ N1111      bf4     3.819    0.43
 N1111      ntf2    4.576    0.55
 N1111      cl      3.524
 P1111      cl      3.453
+P1111      oac     3.855
 ch         cl      3.499    0.35
 # cation-neutral
 c2c1im     C4H10   3.613    0.76
@@ -74,6 +76,8 @@ c1c1pyrr   dme     5.023    0.59
 c2py       C4H10   3.761    0.76
 N1111      C4H10   4.453    0.60
 P1111      C4H10   4.426
+P1111      c6h12   5.667
+P1111      tol     4.467
 # neutral-anion
 C4H10      dca     3.542    0.69
 C6H14      dca     3.608    0.61
@@ -86,6 +90,8 @@ C4H10      cl      3.303
 C4H10      oac     4.273
 C4H10      otf     3.960
 C4H10      pf6     4.279
+c6h12      oac     5.311
+tol        oac     5.561
 dmso       ntf2    4.355    0.69
 dmso       oac     3.844    0.42
 dme        fsi     4.583    0.73
@@ -96,6 +102,9 @@ bz         otf     5.858    0.64
 # neutral-neutral
 C4H10      C4H10   4.170    0.94
 C4H10      tol     3.618    0.90
+C4H10      c6h12   5.125
+c6h12      c6h12   6.062
+tol        tol     6.383
 dmso       dmso    3.912    0.70
 dmso       tol     4.183    0.75
 dmso       C4H10   3.822    0.79
