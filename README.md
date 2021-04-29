@@ -1,4 +1,4 @@
-# pol_il
+# CL&Pol
 
 _Kateryna Goloviznina_ \
 _[Agilio Padua](http://perso.ens-lyon.fr/agilio.padua)_
