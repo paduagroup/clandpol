@@ -1,4 +1,4 @@
-# alpha.ff, version 27/04/2021
+# alpha.ff, version 2021/05/10
 # Polarisable force field for ionic liquids
 # Agilio Padua <agilio.padua@ens-lyon.fr>
 # Kateryna Goloviznina <kateryna.goloviznina@ens-lyon.fr>
@@ -13,6 +13,12 @@ CT2     0.4    -1.0     4184.0   1.016   2.6
 CT3     0.4    -1.0     4184.0   1.016   2.6
 CT      0.4    -1.0     4184.0   1.016   2.6
 HC      0.0     0.0        0.0   0.323   0.0
+# aromatic
+CA      0.4    -1.0     4184.0   1.122   2.6
+HA      0.0     0.0        0.0   0.323   0.0
+CAO     0.4    -1.0     4184.0   1.122   2.6
+CAM     0.4    -1.0     4184.0   1.122   2.6
+CAP     0.4    -1.0     4184.0   1.122   2.6
 # imidazolium PCCP 20(2018)10992
 CR      0.4    -1.0     4184.0   1.122   2.6
 CW      0.4    -1.0     4184.0   1.122   2.6
@@ -56,8 +62,18 @@ OTF     0.4    -1.0     4184.0   1.144   2.6
 O2      0.4    -1.0     4184.0   1.144   2.6    
 CO2     0.4    -1.0     4184.0   1.432   2.6    
 CTA     0.4    -1.0     4184.0   1.016   2.6
+# isovalerate
+C2V     0.4    -1.0     4184.0   1.016   2.6
+C3V     0.4    -1.0     4184.0   1.016   2.6
+CTV     0.4    -1.0     4184.0   1.016   2.6
 # cyclohexanoate
 C3C     0.4    -1.0     4184.0   1.016   2.6
+# phenylacetate
+C2C     0.4    -1.0     4184.0   1.016   2.6
+CPH     0.4    -1.0     4184.0   1.122   2.6
+# p-methylbenzoate
+CBI     0.4    -1.0     4184.0   1.122   2.6
+CBP     0.4    -1.0     4184.0   1.122   2.6
 # hexafluorophosphate PCCP 20(2018)10992
 P       0.4    -1.0     4184.0   1.237   2.6  
 FP      0.4    -1.0     4184.0   0.625   2.6 
