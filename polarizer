@@ -3,7 +3,7 @@
 # Agilio Padua <agilio.padua@ens-lyon.fr>
 # Alain Dequidt <alain.dequidt@uca.fr>
 # Kateryna Goloviznina <kateryna.goloviznina@ens-lyon.fr>
-# version 2021/04/03
+# version 2022/01/16
 
 import argparse
 import random
@@ -642,7 +642,7 @@ class Data(object):
     def lmpscript(self, drude, outdfile, thole = 2.6, cutoff = 12.0):
         """print lines for input script, including pair_style thole"""
 
-        inpstack = "in-p.lmp"
+        inpstack = "in-drude.lmp"
         pairfile = "pair-drude.lmp"
         
         dfound = False
