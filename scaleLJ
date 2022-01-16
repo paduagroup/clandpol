@@ -2,7 +2,7 @@
 # scaleLJ.py - scale epsilon and sigma LJ parameters in pair.lmp LAMMPS file.
 # Agilio Padua <agilio.padua@ens-lyon.fr>
 # Kateryna Goloviznina <kateryna.goloviznina@ens-lyon.fr>
-# version 2021/04/21
+# version 2022/01/16
 
 import sys
 import argparse
@@ -128,7 +128,7 @@ class Forcefield(object):
                     if section == 'monomers':
                         if tok[0].endswith('+') or tok[0].endswith('-'):    
                             tok[0] = tok[0][:-1]
-                        name = tok[0].lower()
+                        name = tok[0]
                         q = float(tok[1])
                         mu  = float (tok[2])
 
@@ -141,8 +141,8 @@ class Forcefield(object):
                         for i in range(0,2):
                             if tok[i].endswith('+') or tok[i].endswith('-'):    
                                 tok[i] = tok[i][:-1]
-                        m1_name = tok[0].lower()
-                        m2_name = tok[1].lower()
+                        m1_name = tok[0]
+                        m2_name = tok[1]
                         r = float (tok[2])
 
                         if next((x for x in self.dimers if (x.m1.name == m1_name and x.m2.name == m2_name) or (x.m1.name == m2_name and x.m2.name  == m1_name)), None):
@@ -430,7 +430,7 @@ class System(object):
                         continue
                     else:
                         tok = line.strip().split()
-                        m_name = tok[0].lower()
+                        m_name = tok[0]
                         if next((x for x in self.fragments if x.name == m_name), None) is not None:
                             raise Exception('  error: fragment {0} is specified twice in {1}'.format(m_name,self.filename))
                         if len(tok)<2:
