@@ -47,17 +47,17 @@ DIMERS
 # m1        m2    r_COM/Å  k_sapt
 # cation-anion
 c2c1im	    dca	    2.935    0.61
-c2c1im	    ntf2	4.314    0.65
+c2c1im	    ntf2    4.314    0.65
 c2c1im	    bf4	    3.088    0.52
 c2c1im	    oac	    4.073    0.27
 c2c1im	    otf	    4.290    0.49
 c2c1im	    mso	    3.546    0.44
 c2c1im      fsi     3.377
-c1c1pyrr	bf4	    3.724    0.46
-c1c1pyrr	dca	    4.094    0.53
-c1c1pyrr	ntf2	4.725    0.54
+c1c1pyrr    bf4	    3.724    0.46
+c1c1pyrr    dca	    4.094    0.53
+c1c1pyrr    ntf2    4.725    0.54
 c2py	    bf4	    3.143    0.51
-c2py	    ntf2	4.206    0.60
+c2py	    ntf2    4.206    0.60
 N1111	    bf4	    3.819    0.43
 N1111	    ntf2	4.576    0.55
 N1111       cl      3.524
@@ -69,15 +69,15 @@ N2000       no3     3.453    0.20
 N1110       ntf2    4.116
 P1111       ntf2    4.422    0.56
 # cation-neutral
-c2c1im	    C4H10	3.613    0.76
-c2c1im	    C6H14	3.992    0.74
+c2c1im	    C4H10   3.613    0.76
+c2c1im	    C6H14   3.992    0.74
 c2c1im	    tol	    3.894    0.63
-c2c1im	    dmso	5.021    0.42
-c2c1im      bz  	4.049    0.62
-c1c1pyrr	C4H10	4.429    0.67
+c2c1im	    dmso    5.021    0.42
+c2c1im      bz      4.049    0.62
+c1c1pyrr    C4H10   4.429    0.67
 c1c1pyrr    dme	    5.023    0.59
-c2py	    C4H10	3.761    0.76
-N1111	    C4H10	4.453    0.60
+c2py	    C4H10   3.761    0.76
+N1111	    C4H10   4.453    0.60
 N1111       urea    3.368
 N1111       ch3cooh 4.480
 N1111       actn    4.672
@@ -90,8 +90,8 @@ ch          meoh    4.015
 # neutral-anion
 C4H10	    dca	    3.542    0.69
 C6H14	    dca	    3.608    0.61
-C4H10	    ntf2	4.436    0.77
-C6H14	    ntf2	4.117    0.77
+C4H10	    ntf2    4.436    0.77
+C6H14	    ntf2    4.117    0.77
 C4H10	    bf4	    3.531    0.51
 C6H14	    bf4	    3.476    0.51
 C4H10	    mso	    3.737    0.56
@@ -105,8 +105,8 @@ urea        cl      3.718
 actn        cl      3.937
 ch3cooh     cl      3.737
 ch3cooh     br      3.944
-dmso	    ntf2	4.355    0.69
-dmso        oac 	3.844    0.42
+dmso	    ntf2    4.355    0.69
+dmso        oac     3.844    0.42
 dme	        fsi	    4.583    0.73
 tol	        mso	    4.898    0.50
 an	        ntf2	4.950    0.71
@@ -114,16 +114,16 @@ bz	        oac	    4.879    0.37
 bz	        otf	    5.858    0.64
 ntf2        me2o    4.519    0.75
 # neutral-neutral
-C4H10	    C4H10	4.170    0.94
+C4H10	    C4H10   4.170    0.94
 C4H10	    tol	    3.618    0.90
 C4H10       ch3cooh 3.501
 C4H10       urea    3.344
 C4H10       meoh    3.691
 C4H10       actn    3.522
-C4H10       dmso	3.822    0.79
-C4H10       dme	 	3.663    0.93
-C4H10       an	 	3.880    0.87
-dmso	    dmso	3.912    0.70
+C4H10       dmso    3.822    0.79
+C4H10       dme	    3.663    0.93
+C4H10       an	    3.880    0.87
+dmso	    dmso    3.912    0.70
 dmso	    tol	    4.183    0.75
 meoh        meoh    4.905
 meoh        urea    3.428
