@@ -10,9 +10,9 @@ Follow the [tutorial](https://github.com/kateryna-goloviznina/pol_il/tree/master
         fftool 1 ch.xyz 1 Cl.zmat 2 EG.zmat -b 20
         packmol <pack.inp
         fftool 1 ch.xyz 1 Cl.zmat 2 EG.zmat -b 20 -a -l
-        polarizer data.lmp data-p.lmp
+        polarizer -f alpha-des.ff data.lmp data-p.lmp
         coul_tt -a 8 13
-        scaleLJ -s
+        scaleLJ -f fragment-des.ff -a alpha-des.ff -s
 
 2. Step 3. According to our recently published paper, the sigma LJ parameter of all O-Cl interactions (in particular, OH and OHG atom types) should be increased from 3.37 Å to 3.70 Å when Cl Lennard-Jones parameters from JPCB 108 (2004) 2038 are used. Hovewer, this step is not required when Cl force field parameters are taken directly from OPLS-AA force field as given in `des.ff` file.
 
