@@ -89,7 +89,7 @@ A Drude particle is created for each atom found in the LAMMPS data `data.lmp` fi
 
 The `polarizer` script then adds new atom types, new bond types, new atoms and new bonds to a new `data-p.lmp` file. It also generates `pair_coeff` commands involving Drude particles that are written to a `pair-drude.lmp` file, which the user should include in the LAMMPS input script.
 
-The `polarizer` script provides example commands to be included in the LAMMPS input script and writes those to `in-p.lmp`. These commands are related to the topology and the force field, namely `fix drude` and `pair_style` commands, and include examples of thermostats:
+The `polarizer` script provides example commands to be included in the LAMMPS input script and writes those to `in-drude.lmp`. These commands are related to the topology and the force field, namely `fix drude` and `pair_style` commands, and include examples of thermostats:
 
     # Commands to include in the LAMMPS input stack
 
@@ -125,7 +125,7 @@ The `polarizer` script provides example commands to be included in the LAMMPS in
     thermo_style custom step [...] f_TSTAT[1] f_TSTAT[2] f_TSTAT[3]
 
     # write Drude particles to dump file
-    dump_modify ... element ... D D D D D D D D D D D
+    dump_modify ... element ... Dp Dp Dp Dp Dp Dp Dp Dp Dp Dp Dp
 
     # ATTENTION!
     #  * read_data may need 'extra/special/per/atom' keyword, LAMMPS will exit with a message
@@ -169,10 +169,10 @@ Values of the scaling factor can be obtained directly from quantum chemistry cal
 
 In some cases it may be useful to scale sigma LJ values to adjust density, and this can be enabled with the `-s` option (which applies a default value of 0.985).
 
-    scaleLJ.py [...] -s                   - scale all fragments' sigma by 0.985
-    scaleLJ.py [...] -s 0.9               - scale all fragments' sigma by a user-defined value
-    scaleLJ.py [...] -s c2c1im c4h10      - scale the specified fragments' sigma by 0.985
-    scaleLJ.py [...] -s 0.9 c2c1im c4h10  - scale the specified fragments' sigma by a user-defined value
+    scaleLJ [...] -s                   - scale all fragments' sigma by 0.985
+    scaleLJ [...] -s 0.9               - scale all fragments' sigma by a user-defined value
+    scaleLJ [...] -s c2c1im c4h10      - scale the specified fragments' sigma by 0.985
+    scaleLJ [...] -s 0.9 c2c1im c4h10  - scale the specified fragments' sigma by a user-defined value
 
 Finally, `fragment.inp` is a small input file that identifies the atomic types corresponding to each fragment, and should be prepared by the user for each system:
 
@@ -200,7 +200,7 @@ Scaled epsilon (and sigma) values for LJ interactions are written to a `pair-sc.
 
 The CL&Pol force field can be mixed with other polarisable force fields, for example the SWM4-NDP model of water. In this case, the scaling of LJ epsilon should be performed only partially, and this can be controlled with `-p` option that identifies already polarisable fragments that don't need scaling:
 
-    python scaleLJ.py [...] -p swm4-ndp
+    python scaleLJ [...] -p swm4-ndp
 
 The scaling coefficient will depend on the charge, dipole and molecular polarisability of this fragment only, the values of which should be specified in the input files for the `scaleLJ` script.
 

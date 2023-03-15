@@ -50,7 +50,7 @@ thermo_style custom step time cpu etotal ke pe ebond eangle evdwl ecoul elong &
 thermo 1000
 
 dump TRAJ all custom 1000 dump.lammpstrj id mol type element q xu yu zu
-dump_modify TRAJ element N C H C C H O H Cl C O H H D D D D D D D D &
+dump_modify TRAJ element N C H C C H O H Cl C O H H Dp Dp Dp Dp Dp Dp Dp Dp &
  sort id
 
 run 10000

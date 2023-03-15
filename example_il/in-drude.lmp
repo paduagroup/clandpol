@@ -35,7 +35,7 @@ fix ICECUBE all momentum 1000 linear 1 1 1
 thermo_style custom step [...] f_TSTAT[1] f_TSTAT[2] f_TSTAT[3]
 
 # write Drude particles to dump file
-dump_modify ... element ... D D D D D D D D D D D
+dump_modify ... element ... Dp Dp Dp Dp Dp Dp Dp Dp Dp Dp Dp
 
 # ATTENTION!
 #  * read_data may need 'extra/special/per/atom' keyword, LAMMPS will exit with a message

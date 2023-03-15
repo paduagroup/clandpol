@@ -3,7 +3,7 @@
 # Agilio Padua <agilio.padua@ens-lyon.fr>
 # Alain Dequidt <alain.dequidt@uca.fr>
 # Kateryna Goloviznina <kateryna.goloviznina@ens-lyon.fr>
-# version 2022/01/16
+# version 2023/03/15
 
 import argparse
 import random
@@ -680,6 +680,7 @@ class Data(object):
 
             f.write("# convenient atom groups (for shake, thermostats...)\n")
             gatoms = gcores = gdrudes = ""
+            ndrude = 0
             for att in self.atomtypes:
                 if att['dflag'] != 'd':
                     gatoms += " {0}".format(att['id'])
@@ -687,6 +688,7 @@ class Data(object):
                     gcores += " {0}".format(att['id'])
                 if att['dflag'] == 'd':
                     gdrudes += " {0}".format(att['id'])
+                    ndrude += 1
             f.write("group ATOMS type" + gatoms + "\n")
             f.write("group CORES type" + gcores + "\n")
             f.write("group DRUDES type" + gdrudes + "\n\n")
@@ -718,10 +720,8 @@ class Data(object):
             f.write("thermo_style custom step [...] "\
                     "f_TSTAT[1] f_TSTAT[2] f_TSTAT[3]\n\n")
 
-            i = drudetypes.find("D")
-
             f.write("# write Drude particles to dump file\n")
-            f.write("dump_modify ... element ... " + drudetypes[i:] + "\n\n")
+            f.write("dump_modify ... element ... " + ndrude*" Dp" + "\n\n")
 
             f.write("# ATTENTION!\n")
             f.write("#  * read_data may need 'extra/special/per/atom' keyword, "
