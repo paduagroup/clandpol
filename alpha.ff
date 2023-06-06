@@ -1,4 +1,4 @@
-# alpha.ff, version 2021/05/10
+# alpha.ff, version 2023/06/05
 # Polarisable force field for ionic liquids
 # Agilio Padua <agilio.padua@ens-lyon.fr>
 # Kateryna Goloviznina <kateryna.goloviznina@ens-lyon.fr>
@@ -48,12 +48,14 @@ H3      0.0     0.0        0.0   0.323   0.0
 # phosphonium PCCP 20(2018)10992
 P3      0.4    -1.0     4184.0   1.237   2.6
 C1P     0.4    -1.0     4184.0   1.016   2.6 
+C2I     0.4    -1.0     4184.0   1.016   2.6
 # bistriflamide PCCP 20(2018)10992
 CBT     0.4    -1.0     4184.0   1.016   2.6    
 NBT     0.4    -1.0     4184.0   1.698   2.6    
 OBT     0.4    -1.0     4184.0   1.144   2.6    
 SBT     0.4    -1.0     4184.0   1.553   2.6    
 F1      0.4    -1.0     4184.0   0.625   2.6    
+FSI     0.4    -1.0     4184.0   0.625   2.6    
 # dicyanamide PCCP 20(2018)10992
 N3A     0.4    -1.0     4184.0   1.698   2.6    
 CZA     0.4    -1.0     4184.0   1.587   2.6    
