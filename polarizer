@@ -3,7 +3,7 @@
 # Agilio Padua <agilio.padua@ens-lyon.fr>
 # Alain Dequidt <alain.dequidt@uca.fr>
 # Kateryna Goloviznina <kateryna.goloviznina@ens-lyon.fr>
-# version 2023/03/15
+# version 2023/07/12
 
 import argparse
 import random
@@ -773,7 +773,7 @@ class Drude(object):
 
                 if tok[0].startswith('H'):
                     if float(tok[4]) != self.alpha_H:
-                        print('warning: different polarizabilities for H')
+                        print(f'warning: different polarizabilities for H, using {self.alpha_H:.3f}')
                     continue
 
                 drude = {}
