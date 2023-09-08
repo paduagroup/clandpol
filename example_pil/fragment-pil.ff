@@ -1,8 +1,0 @@
-MONOMERS
-# name     q/e        mu/D
-N2000        1.0      3.8756 
-no3         -1.0      0.0000
-
-DIMERS
-# m1        m2    r_COM/Å  k_sapt
-N2000       no3     3.453    0.20
