@@ -1,4 +1,4 @@
-# des.ff, version 2021/04/14
+# des.ff, version 2023/09/06
 # Molecular force field for ionic liquids
 # Agilio Padua, J.N. Canongia Lopes
 # contributors: K. Shimizu, A. Podgorsek, F. Hammami, L. Gontrani, M. Mishra,
@@ -43,10 +43,12 @@ Br    Br   79.904  -1.00   lj    4.62376 0.376560
 CTO   CT  12.011   0.145  lj    3.50   0.27614  
 C2O   CT  12.011   0.205  lj    3.50   0.27614  
 #H1O   HC   1.008   0.040  lj    2.50   0.12552
-OH    OH  15.999  -0.563  lj    3.12   0.71128
-HO    HO   1.008   0.298  lj    0.00   0.00000
+OH    OH  15.999  -0.683  lj    3.12   0.71128
+HO    HO   1.008   0.418  lj    0.00   0.00000
 # cholinium same as OPLS-AA alcohols or ammonium (Ferid, Agilio)
 COL   CT  12.011   0.275  lj    3.50   0.27614
+OHC   OH  15.999  -0.563  lj    3.12   0.71128
+HOC   HO   1.008   0.298  lj    0.00   0.00000
 # urea
 CU    C   12.011  +0.142  lj    3.50   0.43932
 OU    O   15.999  -0.390  lj    2.96   0.87864
