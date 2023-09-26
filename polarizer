@@ -3,7 +3,7 @@
 # Agilio Padua <agilio.padua@ens-lyon.fr>
 # Alain Dequidt <alain.dequidt@uca.fr>
 # Kateryna Goloviznina <kateryna.goloviznina@ens-lyon.fr>
-# version 2023/07/12
+# version 2023/09/26
 
 import argparse
 import random
@@ -739,7 +739,7 @@ class Data(object):
 
 kcal =  4.184                           # kJ
 eV   = 96.485                           # kJ/mol
-fpe0 =  0.000719756                     # (4 Pi eps0) in e^2/(kJ/mol A)
+fpe0 =  0.0007197587                    # (4 Pi eps0) in e^2/(kJ/mol A)
 
 
 class Drude(object):

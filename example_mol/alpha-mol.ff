@@ -1,0 +1,11 @@
+# alpha-mol.ff, version 2023/09/26
+# Polarisable force field for ionic liquids
+# Agilio Padua <agilio.padua@ens-lyon.fr>
+#
+# units: u, e, kJ/mol, A, deg
+# kforce is in the form k/2 r_D^2
+
+# type m_D   q_D   k_D    alpha    a_thole
+# OPC3-pol water
+Ow     0.4  -1.0  2092.0  1.15893  2.6
+Hw     0.0   0.0     0.0  0.00     2.6
