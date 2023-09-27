@@ -73,12 +73,12 @@ The `polarizer` script requires an input file (`-f` option) with parameters for 
     ...
 
 * `dm` is the mass to place on the Drude particle (taken from its core),
-* `dq` is the charge to place on the Drude particle (taken from its core),
-* `k` is the harmonic force constant of the bond between core and Drude,
-* `alpha` is the polarizability (hydrogen atoms are not merged),
+* `dq` is the charge of the Drude particle, the sign determines if the Drude particle is negative or positive; the value of dq may be computed from k and alpha,
+* `k` is the harmonic force constant of the bond between core and Drude; the value of k may be computed from dq and alpha,
+* `alpha` is the polarizability of the atom,
 * `thole` is a parameter for the Thole damping function.
 
-The force constant and the charge on the Drude particle are related though <img src="https://render.githubusercontent.com/render/math?math=\alpha = q_D^2/k_D">. Use the `-q` option to read the force constant from `alpha.ff` and to calculate Drude charges from the polarizabilities, or else the `-k` option to read the Drude charge from `alpha.ff` and to calculate force constants from polarizabilities. The former is usually preferred.
+The force constant and the charge on the Drude particle are related though <img src="https://render.githubusercontent.com/render/math?math=\alpha = q_D^2/k_D">. Use the `-q` option to read the force constant from `alpha.ff` and calculate Drude charges from the polarizabilities (default behavior), or else the `-k` option to read the Drude charge from `alpha.ff` and to calculate force constants from polarizabilities. The former is usually preferred.
 
 A Drude particle is created for each atom found in the LAMMPS data `data.lmp` file that corresponds to an atom type given in the Drude file. Since LAMMPS uses numbers for atom types in the data file, the user needs to provide atom type names in comments after each line in the Masses section of the original LAMMPS data file, to allow identification of the atom types (`fftool` does this):
 

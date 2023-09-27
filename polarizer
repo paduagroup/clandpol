@@ -3,7 +3,7 @@
 # Agilio Padua <agilio.padua@ens-lyon.fr>
 # Alain Dequidt <alain.dequidt@uca.fr>
 # Kateryna Goloviznina <kateryna.goloviznina@ens-lyon.fr>
-# version 2023/09/26
+# version 2023/09/27
 
 import argparse
 import random
@@ -16,13 +16,15 @@ Add Drude oscillators to LAMMPS data file.
 ------------------------------------------------------------------------------
 Format of file containing specification of Drude oscillators (alpha.ff):
   # type  dm/u  dq/e  k/(kJ/molA2)  alpha/A3  thole
-  C3H     1.0   0.0   4184.0        1.016     2.6
+  C3H     0.4  -1.0   4184.0        1.016     2.6
   ...
-* dm is the mass to place on the Drude particle (subtracted from its core),
-* dq is the charge to place on the Drude particle (subtracted from its core),
-* k is the harmonic force constant of the bond between core and Drude,
-* alpha is the polarizability, hyrdogen aroms are not merged,
-* thole is a parameter of the Thole damping function.
+* dm is the mass to place on the Drude particle (subtracted from its core)
+* dq is the charge of the Drude particle, its sign determines if Drude particles
+     are negative or positive; dq may be computed from k and alpha
+* k is the harmonic force constant of the bond between core and Drude, and may
+    be computed from qd and alpha
+* alpha is the polarizability
+* thole is a parameter of the Thole damping function
 ------------------------------------------------------------------------------
 A Drude particle is created for each atom in the LAMMPS data file
 that corresponds to an atom type given in the Drude file.
@@ -737,17 +739,17 @@ class Data(object):
 
 # --------------------------------------
 
-kcal =  4.184                           # kJ
-eV   = 96.485                           # kJ/mol
-fpe0 =  0.0007197587                    # (4 Pi eps0) in e^2/(kJ/mol A)
-
+kcal    =  4.184                    # kJ
+eV      = 96.485                    # kJ/mol
+fpe0    =  0.0007197587             # (4 Pi eps0) in e^2/(kJ/mol A)
+alpha_H = 0.323                     # PCCP 20 (2018) 10992
 
 class Drude(object):
     """specification of drude oscillator types"""
 
-    def __init__(self, drudefile, data, kcalc=False, positive=False, metal=False):
+    def __init__(self, drudefile, data, kcalc=False, metal=False):
         self.types = []
-        self.alpha_H = 0.323           # PCCP 20(2018)10992
+        self.alpha_H = alpha_H
 
         with open(drudefile, "r") as f:
 
@@ -783,6 +785,8 @@ class Drude(object):
                 k = float(tok[3])
                 alpha = float(tok[4])
                 drude['thole'] = float(tok[5])
+
+                positive = True if dq > 0.0 else False
 
                 for att in data.atomtypes:
                     if att['type'] == drude['type']:
@@ -821,9 +825,6 @@ def main():
                         help = 'Drude force constants calculated from '\
                         'polarizability (default: k from parameter file '\
                         'and q from polarizability)')
-    parser.add_argument('-p', '--positive', action = 'store_true',
-                        help = 'Drude particles with positive charge '\
-                        '(default: negative charge)')
     parser.add_argument('-t', '--thole', type = float, default = 2.6,
                         help = 'global Thole damping parameter (default: 2.6)')
     parser.add_argument('-c', '--cutoff', type = float, default = 12.0,
@@ -839,7 +840,7 @@ def main():
 
     data = Data(args.infile)
     if not args.depolarize:
-        drude = Drude(args.ffdrude, data, args.kcalc, args.positive, args.metal)
+        drude = Drude(args.ffdrude, data, args.kcalc, args.metal)
         data.polarize(drude)
         data.lmpscript(drude, args.outfile, args.thole, args.cutoff)
     else:
