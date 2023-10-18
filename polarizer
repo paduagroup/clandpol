@@ -840,7 +840,7 @@ def main():
 
     data = Data(args.infile)
     if not args.depolarize:
-        drude = Drude(args.ffdrude, data, args.kcalc, args.metal)
+        drude = Drude(args.alpha_file, data, args.kcalc, args.metal)
         data.polarize(drude)
         data.lmpscript(drude, args.outfile, args.thole, args.cutoff)
     else:

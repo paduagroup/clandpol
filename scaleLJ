@@ -581,8 +581,8 @@ class ScaleLJ(object):
             sys.exit(1)
 
     @staticmethod
-    def WriteResultToFile(pair_out_filename, res):
-        with open(pair_out_filename, 'w+') as f:
+    def WriteResultToFile(pair_out_file, res):
+        with open(pair_out_file, 'w+') as f:
             for line in res:
                 f.write(line+'\n')
 
@@ -648,8 +648,8 @@ def main():
 
     args = parser.parse_args()
 
-    ff = Forcefield(args.ff_filename)
-    syst = System(args.input_filename)
+    ff = Forcefield(args.ff_file)
+    syst = System(args.input_file)
     syst.GetFragments(ff,args.polarisable)
 
     if args.scsig is not None:
@@ -658,13 +658,13 @@ def main():
     syst.GetFragmentPairs(ff)
 
     if (not args.sapt):
-        pol = Polarisation(args.alpha_filename)
+        pol = Polarisation(args.alpha_file)
         syst.GetFragAtoms(pol)
         syst.GetKPred()
     
-    res = ScaleLJ.Scale(args.pair_in_filename,ff,syst,args.sapt,args.scsig)
-    ScaleLJ.WriteResultToFile(args.pair_out_filename, res)
-    print('scaled LJ parameters written to ', args.pair_out_filename)
+    res = ScaleLJ.Scale(args.pair_in_file,ff,syst,args.sapt,args.scsig)
+    ScaleLJ.WriteResultToFile(args.pair_out_file, res)
+    print('scaled LJ parameters written to ', args.pair_out_file)
 
     PrintReport(syst,args.sapt,args.scsig,args.polarisable)
     
