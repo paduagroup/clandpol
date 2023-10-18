@@ -3,7 +3,7 @@
 # Agilio Padua <agilio.padua@ens-lyon.fr>
 # Alain Dequidt <alain.dequidt@uca.fr>
 # Kateryna Goloviznina <kateryna.goloviznina@ens-lyon.fr>
-# version 2023/09/27
+# version 2023/10/18
 
 import argparse
 import random
@@ -819,7 +819,7 @@ class Drude(object):
 def main():
     parser = argparse.ArgumentParser(description = usage,
              formatter_class = argparse.RawTextHelpFormatter)
-    parser.add_argument('-f', '--ffdrude', default = 'alpha.ff',
+    parser.add_argument('-a', '--alpha_file', default = 'alpha.ff',
                         help = 'Drude parameter file (default: alpha.ff)')
     parser.add_argument('-k', '--kcalc', action = 'store_true',
                         help = 'Drude force constants calculated from '\

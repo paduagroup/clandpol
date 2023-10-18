@@ -2,7 +2,7 @@
 # scaleLJ.py - scale epsilon and sigma LJ parameters in pair.lmp LAMMPS file.
 # Agilio Padua <agilio.padua@ens-lyon.fr>
 # Kateryna Goloviznina <kateryna.goloviznina@ens-lyon.fr>
-# version 2022/01/16
+# version 2023/10/18
 
 import sys
 import argparse
@@ -633,11 +633,11 @@ def PrintReport(syst, sapt, scsig, polarisable):
 
 def main():
     parser = argparse.ArgumentParser(description = usage, formatter_class = argparse.RawTextHelpFormatter)
-    parser.add_argument('-f', '--ff_filename', type=str, default = 'fragment.ff', help = 'fragment force field (default: fragment.ff)')
-    parser.add_argument('-a', '--alpha_filename', type=str, default = 'alpha.ff', help = 'polarisability values file (default: alpha.ff)')
-    parser.add_argument('-i', '--input_filename', type=str, default = 'fragment.inp', help = 'fragment input file with atomic indices (default: fragment.inp)')
-    parser.add_argument('-ip', '--pair_in_filename', type=str, default = 'pair.lmp', help = 'pair style input file (default: pair.lmp)')
-    parser.add_argument('-op', '--pair_out_filename', type=str, default = 'pair-sc.lmp', help = 'pair style output file (default: pair-sc.lmp)')
+    parser.add_argument('-f', '--ff_file', type=str, default = 'fragment.ff', help = 'fragment force field (default: fragment.ff)')
+    parser.add_argument('-a', '--alpha_file', type=str, default = 'alpha.ff', help = 'polarisability values file (default: alpha.ff)')
+    parser.add_argument('-i', '--input_file', type=str, default = 'fragment.inp', help = 'fragment input file with atomic indices (default: fragment.inp)')
+    parser.add_argument('-ip', '--pair_in_file', type=str, default = 'pair.lmp', help = 'pair style input file (default: pair.lmp)')
+    parser.add_argument('-op', '--pair_out_file', type=str, default = 'pair-sc.lmp', help = 'pair style output file (default: pair-sc.lmp)')
     parser.add_argument('-q', '--sapt', action = 'store_true', help = 'use sapt calculated k values, default: use predicted k values')
     parser.add_argument('-s', '--scsig', nargs='*', type = str,  help = 'scale sigma if specified; default value: 0.985; \n\
     -s                       - scale all fragments\' sigma by 0.985 \n\
