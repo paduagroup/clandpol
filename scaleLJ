@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# scaleLJ.py - scale epsilon and sigma LJ parameters in pair.lmp LAMMPS file.
+# scaleLJ - scale epsilon and sigma LJ parameters in pair.lmp LAMMPS file.
 # Agilio Padua <agilio.padua@ens-lyon.fr>
 # Kateryna Goloviznina <kateryna.goloviznina@ens-lyon.fr>
 # version 2023/11/02
