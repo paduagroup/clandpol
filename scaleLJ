@@ -2,7 +2,7 @@
 # scaleLJ.py - scale epsilon and sigma LJ parameters in pair.lmp LAMMPS file.
 # Agilio Padua <agilio.padua@ens-lyon.fr>
 # Kateryna Goloviznina <kateryna.goloviznina@ens-lyon.fr>
-# version 2023/10/18
+# version 2023/11/02
 
 import sys
 import argparse
@@ -72,9 +72,9 @@ class _Const(object):
         except ValueError:
             return False
 
-
-# monomer in fragment.ff        
 class Monomer (object):
+    '''monomer in fragment.ff'''
+
     def __init__(self, name, q, mu):
         self.name = name
         self.q = q
@@ -83,8 +83,9 @@ class Monomer (object):
     def __str__(self):
         return '{0:10s}  q = {1:2d}   mu = {3:6.4f} D'.format(self.name, self.q, self.mu)
 
-# dimer in fragment.ff
 class Dimer (object):
+    '''dimer in fragment.ff'''
+
     def __init__(self, m1, m2):
         self.m1 = m1
         self.m2 = m2
@@ -106,8 +107,11 @@ class Dimer (object):
         return res
 
 class Forcefield(object):
-    #  read fragment.ff
+    '''fragment force field from fragment.ff'''
+
     def __init__(self, filename):
+        '''read fragment.ff'''
+
         self.filename = filename
         self.monomers = []
         self.dimers= []
@@ -128,7 +132,7 @@ class Forcefield(object):
                     if section == 'monomers':
                         if tok[0].endswith('+') or tok[0].endswith('-'):    
                             tok[0] = tok[0][:-1]
-                        name = tok[0]
+                        name = tok[0].lower()
                         q = float(tok[1])
                         mu  = float (tok[2])
 
@@ -141,8 +145,8 @@ class Forcefield(object):
                         for i in range(0,2):
                             if tok[i].endswith('+') or tok[i].endswith('-'):    
                                 tok[i] = tok[i][:-1]
-                        m1_name = tok[0]
-                        m2_name = tok[1]
+                        m1_name = tok[0].lower()
+                        m2_name = tok[1].lower()
                         r = float (tok[2])
 
                         if next((x for x in self.dimers if (x.m1.name == m1_name and x.m2.name == m2_name) or (x.m1.name == m2_name and x.m2.name  == m1_name)), None):
@@ -165,8 +169,9 @@ class Forcefield(object):
             print(e)
             sys.exit(1)
 
-    # create new dimer from two monomers
     def SetDimer(self, m1_name, m2_name):
+        '''create dimer from two monomers'''
+
         try:
             m1 = next((x for x in self.monomers if x.name == m1_name), None)
             m2 = next((x for x in self.monomers if x.name == m2_name), None)
@@ -190,8 +195,12 @@ class Forcefield(object):
             res+='\n'+str(d)
         return res    
 
-# fragment in fragment.inp; fragment is based on monomer with index range in currect system added        
 class Fragment(Monomer):
+    """
+    a fragment in frag.inp
+    fragment is based on monomer with index range in current system added     
+    """
+
     def __init__(self, m, ind_range, res):
         self.name = m.name
         self.q = m.q
@@ -204,9 +213,10 @@ class Fragment(Monomer):
     def __str__(self):
             return '{0:10s}  q = {1:5.2f}  mu = {2:6.4f} D    Pol = {3:5s} ScaleEps = {4:5s} ScaleSig = {5:5s} Atoms={5:s} '.format(self.name, self.q, self.mu,self.pol_model, self.scale_eps, self.scale_sig, self.ind_range)
 
-    # checks if fragment is polarisable
     @staticmethod
     def PolExclude(m, p):
+        '''check if fragment is polarisable'''
+
         pol_model = False
         scale_eps = True
 
@@ -218,8 +228,9 @@ class Fragment(Monomer):
         
         return (pol_model,scale_eps)
 
-    # read atoms from .mol for a given fragment
     def GetAtomsFromMol(self, pol):
+        '''read atoms from .mol for a given fragment'''
+
         zfilename = self.name+'.mol'
         with open(zfilename, 'r') as f:
             atoms = []
@@ -241,8 +252,9 @@ class Fragment(Monomer):
                     print('warning:  error: atom type {0} not found in {1}'.format(at_name,pol.filename))
         self.atoms = atoms
 
-    # read atoms from .pdb for a given fragment
     def GetAtomsFromPdb(self, pol):
+        '''read atoms from .pdb for a given fragment'''
+
         zfilename = self.name+'.pdb'
         with open(zfilename, 'r') as f:
             atoms = []
@@ -265,8 +277,9 @@ class Fragment(Monomer):
                 line = f.readline()
         self.atoms = atoms
 
-    # read atoms from .zmat for a given fragment
     def GetAtomsFromZmat(self, pol):
+        '''read atoms from .zmat for a given fragment'''
+
         try:
             zfilename = self.name+'.zmat'
             with open(zfilename, 'r') as f:
@@ -304,8 +317,9 @@ class Fragment(Monomer):
             print(e)
             sys.exit(1)
 
-    # read atoms from .xyz for a given fragment
     def GetAtomsFromXYZ(self, pol):
+        '''read atoms from .xyz for a given fragment'''
+
         try:
             xyzfilename = self.name+'.xyz'
             with open(xyzfilename, 'r') as f:
@@ -341,8 +355,9 @@ class Fragment(Monomer):
             print(e)
             sys.exit(1)
 
-# fragment pair that is based on dimer but uses fragments (not monomers) as units            
 class FragmentPair(Dimer):
+    '''fragment pair based on dimer but uses fragments (not monomers) as units'''
+
     def __init__(self, fr1, fr2, r, k_sapt):
         self.fr1 = fr1
         self.fr2  = fr2
@@ -357,8 +372,12 @@ class FragmentPair(Dimer):
             res += '    k_sapt = {0:4.2f}'.format(self.k_sapt)
         return res
 
-    # predicts k factor for a given fragment pair based on total charge, alpha, dipole moment of fragment and interfragment distance 
     def PredictK(self):
+        """
+        predict k factor for a given fragment pair based on:
+        total charge, alpha, dipole moment of fragment and interfragment distance
+        """
+    
         alpha_fr1 = [sum(x.alpha for x in self.fr1.atoms)][0]
         alpha_fr2 = [sum(x.alpha for x in self.fr2.atoms)][0]
         k_pred = 1.0
@@ -374,8 +393,9 @@ class FragmentPair(Dimer):
         k_pred = 1/k_pred
         self.k_pred = k_pred
 
-# atom type with polarisability value       
 class AtomType(object):
+    '''atom type with polarisability value'''
+
     def __init__(self, name, alpha):
         self.name = name
         self.alpha = alpha
@@ -383,8 +403,9 @@ class AtomType(object):
     def __str__(self):
         return  '{0:s}    {1:6.3f}'.format(self.name, self.alpha)
 
-# polarisability values for all atom types; from alpha.ff
 class Polarisation(object):
+    '''polarisability values for all atom types; from alpha.ff'''
+
     def __init__(self, filename):
         self.filename = filename
         self.atomtypes = []
@@ -414,15 +435,17 @@ class Polarisation(object):
             res += '\n' + str(at)
         return res
 
-# system that consist of fragments from fragment.inp 
 class System(object):
+    '''system that consist of fragments from fragment.inp'''
+
     def __init__(self, filename):
         self.fragments = []
         self.fragmentpairs = []
         self.filename = filename
     
-    # read fragments from fragment.inp    
     def GetFragments(self, ff, p):
+        '''read fragments from fragment.inp'''
+
         try:
             with open(self.filename, 'r') as f:
                 for line in f:
@@ -430,7 +453,7 @@ class System(object):
                         continue
                     else:
                         tok = line.strip().split()
-                        m_name = tok[0]
+                        m_name = tok[0].lower()
                         if next((x for x in self.fragments if x.name == m_name), None) is not None:
                             raise Exception('  error: fragment {0} is specified twice in {1}'.format(m_name,self.filename))
                         if len(tok)<2:
@@ -455,8 +478,8 @@ class System(object):
             print(e)
             sys.exit(1)
 
-    # generates fragment pairs based on fragment list; fragment pairs are not formed for ++ and -- combinations
     def GetFragmentPairs(self, ff):
+        '''generate fragment pairs based on fragment list; fragment pairs are not formed for ++ and -- combinations'''
         try:
             i = j = 0
             for i in range(0,len(self.fragments)):
@@ -505,8 +528,9 @@ class System(object):
             res+='\n'+str(frp)
         return res
 
-    # call a function to get atom list for fragments based on existing atom type 
     def GetFragAtoms(self, pol):
+        '''get atom list for fragments based on existing atom type '''
+
         try:
             for fr in self.fragments:
                 if os.path.exists('./'+fr.name+'.zmat'):
@@ -528,8 +552,9 @@ class System(object):
         for frp in self.fragmentpairs:
             frp.PredictK()
  
-# class with static functions to scale sigma and epsilon in pair-p.lmp and print output file             
 class ScaleLJ(object):
+    '''class with static functions to scale sigma and epsilon in pair-p.lmp and print output file'''
+
     @staticmethod
     def Scale(pair_in_file, ff, syst, sapt, scsig):
         try:
@@ -587,6 +612,8 @@ class ScaleLJ(object):
                 f.write(line+'\n')
 
 def PrintReport(syst, sapt, scsig, polarisable):
+    '''print report to screen'''
+
     report = "Epsilon LJ coefficients were scaled by "
     if sapt:
         report += "k_sapt"
