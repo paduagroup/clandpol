@@ -150,16 +150,14 @@ class Data(object):
                     if keyword == line:
                         found = 1
                         if length not in headers:
-                            raise RuntimeError("data section {} "\
-                                  "has no matching header value".format(line))
+                            raise RuntimeError(f'data section {line} has no matching header value')
                         f.readline()
                         list_ = []
                         for _ in range(headers[length]):
                             list_.append(f.readline())
                         sections[keyword] = list_
                 if not found:
-                    raise RuntimeError("invalid section {} in data"\
-                                       " file".format(line))
+                    raise RuntimeError(f'invalid section {line} in data file')
             #f.readline()
             line = f.readline()
             if not line:
@@ -195,7 +193,7 @@ class Data(object):
             for pair in skeywords:
                 keyword = pair[0]
                 if keyword in self.sections:
-                    f.write("\n{}\n\n".format(keyword))
+                    f.write(f'\n{keyword}\n\n')
                     for line in self.sections[keyword]:
                         f.write(line)
 
@@ -210,8 +208,7 @@ class Data(object):
         for line in self.sections['Masses']:
             tok = line.split()
             if len(tok) < 4:
-                print("error: missing type for atom ID " + tok[0] +
-                      " in Masses section")
+                print(f'error: missing type for atom ID {tok[0]} in Masses section')
                 missinglabels = True
                 continue
             atomtype = {}
@@ -221,7 +218,7 @@ class Data(object):
             self.atomtypes.append(atomtype)
 
         if missinglabels:
-            raise RuntimeError("missing atom labels")
+            raise RuntimeError('missing atom labels')
 
         # extract atom registers
         for line in self.sections['Atoms']:
@@ -600,10 +597,9 @@ class Data(object):
 
         with open(pairfile, "w") as f:
             f.write("# interactions involving Drude particles\n")
-            f.write("pair_coeff    * {0:3d}* coul/long/cs\n".format(att_id))
+            f.write(f"pair_coeff    * {att_id:3d}* coul/long/cs\n")
 
-            f.write("# Thole dipole-dipole damping if more than "\
-                    "1 Drude per molecule\n")
+            f.write("# Thole dipole-dipole damping if more than 1 Drude per molecule\n")
             # Thole parameters for I,J pairs
             ifound = False
             for atti in self.atomtypes:
@@ -667,16 +663,15 @@ class Data(object):
             f.write("# Commands to include in the LAMMPS input stack\n\n")
 
             f.write("# adapt the pair_style command as needed\n")
-            f.write("pair_style hybrid/overlay [...] coul/long/cs {0:.1f} "\
-                  "thole {1:.3f} {0:.1f}\n\n".format(cutoff, thole))
+            f.write(f"pair_style hybrid/overlay [...] coul/long/cs {cutoff:.1f} thole {thole:.3f} {cutoff:.1f}\n\n")
 
             f.write("# new data file with Drude oscillators added\n")
-            f.write("read_data {0}\n\n".format(outdfile))
+            f.write(f"read_data {outdfile}\n\n")
 
             f.write("# read pair interactions involving Drude particles\n")
             f.write("# Thole damping recommended if more than 1 Drude "\
                     "per molecule\n")
-            f.write("include {0}\n\n".format(pairfile))
+            f.write(f"include {pairfile}\n\n")
 
             self.writepairfile(pairfile, drude, thole, att['id'])
 
@@ -762,7 +757,7 @@ class Drude(object):
                     tok = line.split()
                     self.alpha_H = float(tok[4])
                     break
-            print('Polarizability of H merged into heavy atoms: {0:.3f} A3'.format(self.alpha_H))
+            print(f'Polarizability of H merged into heavy atoms: {self.alpha_H:.3f} A3')
             f.seek(0)
 
             data.countH()
@@ -775,7 +770,7 @@ class Drude(object):
 
                 if tok[0].startswith('H'):
                     if float(tok[4]) != self.alpha_H:
-                        print(f'warning: different polarizabilities for H, using {self.alpha_H:.3f}')
+                        print(f'warning: different polarizabilities for H, using {self.alpha_H:.3f} A3')
                     continue
 
                 drude = {}
