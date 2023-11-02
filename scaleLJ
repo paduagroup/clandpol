@@ -249,14 +249,14 @@ class Fragment(Monomer):
                 if atom is not None:
                     atoms.append(atom)
                 else:
-                    print('warning:  error: atom type {0} not found in {1}'.format(at_name,pol.filename))
+                    print('warning:  error: atom type {0} not found in {1}'.format(at_name, pol.filename))
         self.atoms = atoms
 
     def GetAtomsFromPdb(self, pol):
         '''read atoms from .pdb for a given fragment'''
 
-        zfilename = self.name+'.pdb'
-        with open(zfilename, 'r') as f:
+        filename = self.name+'.pdb'
+        with open(filename, 'r') as f:
             atoms = []
             line = f.readline()
             while 'COMPND' not in line:
@@ -273,7 +273,7 @@ class Fragment(Monomer):
                 if atom is not None:
                     atoms.append(atom)
                 else:
-                    print('warning:  error: atom type {0} not found in {1}'.format(at_name,pol.filename))
+                    print('warning:  error: atom type {0} not found in {1}'.format(at_name, pol.filename))
                 line = f.readline()
         self.atoms = atoms
 
@@ -306,12 +306,12 @@ class Fragment(Monomer):
                     if atom is not None:
                         atoms.append(atom)
                     else:
-                        print('warning:  error: atom type {0} not found in {1}'.format(at_name,pol.filename))
+                        print('warning:  error: atom type {0} not found in {1}'.format(at_name, pol.filename))
                     line = f.readline()
             self.atoms = atoms
                             
         except IOError:
-            print('  error: fragment zmat file {0} not found'.foramt(filename))
+            print('  error: fragment zmat file {0} not found'.format(zfilename))
             sys.exit(1)
         except Exception as e:
             print(e)
@@ -344,12 +344,12 @@ class Fragment(Monomer):
                     if atom is not None:
                         atoms.append(atom)
                     else:
-                        print('warning:  error: atom type {0} not found in {1}'.format(at_name,pol.filename))
+                        print('warning:  error: atom type {0} not found in {1}'.format(at_name, pol.filename))
                     line = f.readline()
             self.atoms = atoms
                             
         except IOError:
-            print('  error: fragment zmat file {0} not found'.foramt(filename))
+            print('  error: fragment zmat file {0} not found'.format(xyzfilename))
             sys.exit(1)
         except Exception as e:
             print(e)
@@ -455,9 +455,9 @@ class System(object):
                         tok = line.strip().split()
                         m_name = tok[0].lower()
                         if next((x for x in self.fragments if x.name == m_name), None) is not None:
-                            raise Exception('  error: fragment {0} is specified twice in {1}'.format(m_name,self.filename))
+                            raise Exception('  error: fragment {0} is specified twice in {1}'.format(m_name, self.filename))
                         if len(tok)<2:
-                            raise Exception('  error: no index range for {0} fragment in {1}'.format(m_name,self.filename))
+                            raise Exception('  error: no index range for {0} fragment in {1}'.format(m_name, self.filename))
                         ind_range = []
                         for ind in tok[1:]:
                             if ':' in ind:
@@ -472,7 +472,7 @@ class System(object):
                     self.fragments.append(Fragment(m,ind_range,Fragment.PolExclude(m,p)))
 
         except IOError:
-            print('  error: fragment input file {0} not found'.format(filename))
+            print('  error: fragment input file {0} not found'.format(self.filename))
             sys.exit(1)
         except Exception as e:
             print(e)
@@ -599,7 +599,7 @@ class ScaleLJ(object):
             return res
         
         except IOError:
-            print('  error: pair style file {0} not found'.format(pair_file))
+            print('  error: pair style file {0} not found'.format(pair_in_file))
             sys.exit(1)
         except Exception as e:
             print(e)
