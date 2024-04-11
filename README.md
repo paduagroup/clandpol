@@ -27,7 +27,7 @@ _[Agilio Padua](http://perso.ens-lyon.fr/agilio.padua)_
 
 * [Python](http://www.python.org/)
 * [fftool](https://github.com/paduagroup/fftool)
-* [Packmol](http://www.ime.unicamp.br/~martinez/packmol/)
+* [Packmol](https://github.com/m3g/packmol)
 
 
 ## Obtaining
