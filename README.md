@@ -26,7 +26,7 @@ _[Agilio Padua](http://perso.ens-lyon.fr/agilio.padua)_
 ## Requirements
 
 * [Python](http://www.python.org/)
-* [fftool](https://github.com/agiliopadua/fftool)
+* [fftool](https://github.com/paduagroup/fftool)
 * [Packmol](http://www.ime.unicamp.br/~martinez/packmol/)
 
 
@@ -34,7 +34,7 @@ _[Agilio Padua](http://perso.ens-lyon.fr/agilio.padua)_
 
 Download the files or clone the repository:
 
-    git clone https://github.com/agiliopadua/pol_il.git
+    git clone https://github.com/paduagroup/clandpol.git
 
 
 ## Tutorial
