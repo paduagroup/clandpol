@@ -64,13 +64,13 @@ c2c1im     pf6     4.183
 c1c1pyrr   bf4     3.724    0.46
 c1c1pyrr   dca     4.094    0.53
 c1c1pyrr   ntf2    4.725    0.54
-c1c1pyrr   fsi     4.500
+c1c1pyrr   fsi     4.358
 c2py       bf4     3.143    0.51
 c2py       ntf2    4.206    0.60
 N1111      bf4     3.819    0.43
 N1111      ntf2    4.576    0.55
 N1111      cl      3.524
-N1111      oac     4.000
+N1111      oac     3.995
 N2000      no3     3.453    0.20
 P1111      cl      3.453
 P1111      oac     3.855
@@ -118,7 +118,7 @@ c6h12      oac     5.311
 tol        oac     5.221
 meoh       cl      3.165
 meoh       br      3.340
-meoh       oac     4.000
+meoh       oac     3.567
 urea       cl      3.718
 actn       cl      3.937
 ch3cooh    cl      3.737
