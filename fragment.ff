@@ -1,4 +1,4 @@
-# fragment.ff, version 2023/09/08
+# fragment.ff, version 2024/07/04
 # Polarisable force field for ionic liquids
 # Agilio Padua <agilio.padua@ens-lyon.fr>
 # Kateryna Goloviznina <kateryna.goloviznina@ens-lyon.fr>
@@ -17,6 +17,8 @@ P1111        1.0      0.0015
 N1110        1.0      0.8461
 N2000        1.0      3.8756
 ch           1.0      3.4533
+Na           1.0      0.0
+Li           1.0      0.0
 # anions 
 dca         -1.0      0.8874
 bf4         -1.0      0.0000
@@ -77,6 +79,8 @@ P1111      oac     3.855
 P1111      fsi     4.226
 P1111      ntf2    4.422    0.56
 ch         cl      3.499    0.35
+Na         fsi     2.815
+Li         fsi     2.548
 # cation-neutral
 c2c1im     C4H10   3.613    0.76
 c2c1im     C6H14   3.992    0.74
@@ -100,6 +104,10 @@ P1111      me2o    4.093    0.58
 P1111      meoh    4.051
 N1110      C4H10   4.403
 ch         meoh    4.015
+Na         dme     2.245
+Li         dme     1.737
+Na         C4H10   3.506
+Li         C4H10   3.133
 # neutral-anion
 C4H10      dca     3.542    0.69
 C6H14      dca     3.608    0.61
