@@ -62,7 +62,7 @@ Use `fftool` to create `data.lmp`, `in.lmp` and `pair.lmp` files. A separate `pa
 
 #### 1.2 Add Drude induced dipoles to LAMMPS data file
 
-    polarizer -f alpha.ff data.lmp data-p.lmp
+    polarizer -a alpha.ff data.lmp data-p.lmp
 
 The `polarizer` script requires an input file (`-f` option) with parameters for Drude induced dipoles in the format:
 
