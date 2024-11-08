@@ -1,4 +1,4 @@
-# alpha-mol.ff, version 2023/09/26
+# alpha-mol.ff, version 2024/11/08
 # Polarisable force field for ionic liquids
 # Agilio Padua <agilio.padua@ens-lyon.fr>
 #
@@ -6,6 +6,6 @@
 # kforce is in the form k/2 r_D^2
 
 # type m_D   q_D   k_D    alpha    a_thole
-# OPC3-pol water
-Ow     0.4  -1.0  2092.0  1.15893  2.6
-Hw     0.0   0.0     0.0  0.00     2.6
+# alpha of H merged into heavy atoms (value 0.323)
+# POL3 water, JPCB 116 (2012) 7999, alpha_O = 0.528, alpha_H = 0.170
+Ow     0.4  -1.0  4184.0  0.222    2.6

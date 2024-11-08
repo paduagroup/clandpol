@@ -1,4 +1,4 @@
-# fragment.ff, version 2024/07/04
+# fragment.ff, version 2024/11/08
 # Polarisable force field for ionic liquids
 # Agilio Padua <agilio.padua@ens-lyon.fr>
 # Kateryna Goloviznina <kateryna.goloviznina@ens-lyon.fr>
@@ -52,6 +52,7 @@ nmp          0.0      3.7301
 actn         0.0      2.6009
 ch3cooh      0.0      4.0667
 me2o         0.0      1.2190
+h2o          0.0      2.0430
 
 DIMERS
 # m1        m2     r_COM/Å  k_sapt
@@ -87,6 +88,7 @@ c2c1im     C6H14   3.992    0.74
 c2c1im     tol     3.894    0.63
 c2c1im     dmso    5.021    0.42
 c2c1im     bz      4.049    0.62
+c2c1im     h2o     3.736
 c1c1pyrr   C4H10   4.429    0.67
 c1c1pyrr   dme     5.023    0.59
 c2py       C4H10   3.761    0.76
@@ -140,6 +142,8 @@ bz         oac     4.879    0.37
 bz         otf     5.858    0.64
 bz         br      4.792
 me2o       ntf2    4.519    0.75
+h2o        ntf2    3.867
+h2o        oac     3.132
 # neutral-neutral
 C4H10      C4H10   4.170    0.94
 C4H10      tol     3.618    0.90
@@ -170,3 +174,4 @@ bz         bz      3.800    0.95
 bz         nmp     5.010    0.89
 nmp        nmp     3.518    0.79
 me2o       me2o    3.976    0.82
+h2o        h2o     2.780
