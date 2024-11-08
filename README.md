@@ -218,8 +218,8 @@ The input files of a system consisting of one ethylammonium nitrate ion pair can
     fftool 1 N2000.zmat 1 no3.zmat -b 20
     packmol < pack.inp
     fftool 1 N2000.zmat 1 no3.zmat -b 20 -a -l
-    polarizer -f alpha.ff data.lmp data-p.lmp
-    scaleLJ -q 
+    polarizer -a alpha-pil.ff data.lmp data-p.lmp
+    scaleLJ -q -f fragment.ff -a alpha-pil.ff -i fragment.inp -ip pair.lmp -op pair-sc.lm
 
 Here modification of the coefficients of LJ interactions between N2000 and NO3 fragments is performed using the scaling factor obtained through SAPT calculation (`-q` option).
 
