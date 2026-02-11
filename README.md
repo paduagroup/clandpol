@@ -23,6 +23,8 @@ _[Agilio Padua](http://perso.ens-lyon.fr/agilio.padua)_
 
 * `example_des/`: examples of choline chloride:ethylene glycol (ChCl:EG) molecule files and force field database (deep eutectic solvent).
 
+* `SAPT/`: example inputs for SAPT calculations of the LJ scaling parameter.
+
 ## Requirements
 
 * [Python](http://www.python.org/)
